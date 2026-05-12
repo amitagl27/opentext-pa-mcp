@@ -1,0 +1,3609 @@
+﻿
+
+
+
+
+
+	
+		
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="shortcut icon" href="/home/exampletenant/app/admin/web/favicon.ico">
+	<script type="text/javascript" src="/home/exampletenant/app/../wcp/library/system/csrf.js"></script>
+	<link href="/home/exampletenant/app/admin/web/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="/home/exampletenant/app/admin/web/css/customized-error.css" rel="stylesheet" />
+	<link href="/home/exampletenant/app/admin/web/css/admin-header.css" rel="stylesheet" />
+	<link href="/home/exampletenant/app/admin/web/css/layout.css" rel="stylesheet" />
+	<link href="/home/exampletenant/app/admin/web/css/listview.css" rel="stylesheet" />
+	<script src="/home/exampletenant/app/admin/web/scripts/knockout-3.5.1.debug.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/jquery.min.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/bootstrap.min.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/underscore.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/backbone.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/backbone.layoutmanager.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/backbone-associations.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/fileDownload.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/otPage.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/otBusyIndicator.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/otBusyIndicatorManager.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/otUtils.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/otSolutionManager.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/WellKnownElementGuids.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/mainapplication.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/messenger.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/busy.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/solutions.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/solutions.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/configurations.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/configurations.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/configuration.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/createpropertytoolbar.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/property.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/collections/properties.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/propertylist.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/propertylist.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/propertyitem.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/adhocpropertyitem.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/databaseReference.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/SolutionModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/WizardModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/EntityModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/WizardView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/EntityView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/SolutionView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/DimensionView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/DimensionEntityView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/DimensionErrorMessageView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/DimensionEntityModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/GraphModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/VertexModel.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/createpropertydialog.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/modals/messages/ModalMessage.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/modals/windows/Standard.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/EdgeModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/DimensionErrorMessageModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/DimensionModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/collections/iHub/EntityCollection.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/collections/iHub/SolutionCollection.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/collections/iHub/EntityDimensionCollection.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/collections/iHub/EntityEdgeCollection.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/collections/iHub/EntityVertexCollection.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/SelectedDimensionView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/WarningView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/iHub/SelectedEntityDimensionView.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/iHub/SelectedDimensionModel.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/databaseReference.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/entityProperties.js"></script>
+
+	<script src="/home/exampletenant/app/admin/web/js/views/propertyMapping.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/axPropertyMapping.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/instanceRoleMapping.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/coreContentInstanceRoleMapping.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/coreContentMapping.js"></script>
+
+	<script src="/home/exampletenant/app/admin/web/js/views/businessWorkspaceConfigurationReport.js"></script>
+
+	<script src="/home/exampletenant/app/admin/web/js/views/contentServerConfigurationReport.js"></script>
+
+	<script src="/home/exampletenant/app/admin/web/js/models/businessWorkspaceConfigurationReport.js"></script>
+
+	<script src="/home/exampletenant/app/admin/web/js/models/metadataConfigurator/deleteDocTypeConfirmationDialog.js"></script>	
+	<script src="/home/exampletenant/app/admin/web/js/views/metadataConfigurator/deleteDocTypeConfirmationDialog.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/metadataConfigurator/manageDocTypeMetadataConfig.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/metadataConfigurator/manageDocTypeMetadataConfig.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/metadataConfigurator/renderConfigeredDocTypeMetaData.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/metadataConfigurator/renderConfigeredDocTypeMetaData.js"></script>
+
+	<script src="/home/exampletenant/app/admin/web/js/models/metadataConfigurator/metadataConfigurator.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/metadataConfigurator/metadataConfigurator.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/metadataConfigurator/metadataDialogTable.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/metadataConfigurator/metadataDialogTable.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/metadataConfigurator/metadataAddNewRow.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/metadataConfigurator/metadataAddNewRow.js"></script>
+
+	<script src="/home/exampletenant/app/admin/web/js/models/renditions/renditionConfigurations.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/renditions/renditionConfigurations.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/renditions/renditionDialogTable.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/renditions/renditionDialogTable.js"></script>
+	
+	<script src="/home/exampletenant/app/admin/web/js/models/contentRepositoryConfiguration.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/contentRepositoryConfiguration.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/deleteContentRepository.js"></script>
+
+	<script	src="/home/exampletenant/app/admin/web/js/models/entityProperties.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/grant.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/securityPolicyRole.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/securityPolicy.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/collections/grants.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/collections/securityPolicyRoles.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/securityPolicy.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/solutionAvailability.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/solutionAvailability.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/archivePolicyConfiguration.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/archivepolicyConfig.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/solutionErrors.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/pendingDDLStatements.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/emailConfig.js"></script>
+
+	<script	src="/home/exampletenant/app/admin/web/scripts/jquery.globalize/globalize.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/messages/admin.messages.en-US.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/messages/admin.messages.en-US.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/eisRepositoryReference.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/eisRepositoryReference.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/models/emailConfiguration.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/views/eisExternalReference.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/replaceRevertButtons.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/replaceRevertButtons.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/configurationProperties.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/configurationProperties.js"></script>
+	
+	<script	src="/home/exampletenant/app/admin/web/js/views/emailWithBusinessIDView.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/emailWithBusinessIDListView.js"></script>
+	
+	<script	src="/home/exampletenant/app/admin/web/js/models/emailWithBusinessIDModel.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/collections/emailWithBusinessIDCollection.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/autoLogout.js"></script>
+
+	<!-- Document Store scripts | NOTE: The order of these scripts matter! -->
+	<script	src="/home/exampletenant/app/admin/web/js/models/documentstore/viewer/app-enhancer/AeViewerParameter.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/documentstore/viewer/app-enhancer/AeViewerConfig.js"></script>
+
+	<script	src="/home/exampletenant/app/admin/web/js/collections/documentstore/viewer/app-enhancer/AeViewerParameters.js"></script>
+
+	<script	src="/home/exampletenant/app/admin/web/js/views/documentstore/viewer/app-enhancer/AeViewerParameter.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/documentstore/viewer/app-enhancer/AeViewerParameters.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/documentstore/viewer/app-enhancer/AeViewerParameterDialog.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/documentstore/viewer/app-enhancer/AeViewerConfig.js"></script>
+	<script src="/home/exampletenant/app/admin/web/js/purify.js"></script>
+	<!-- /Document Store scripts -->
+
+	<!-- Entity List Search | NOTE: The order of these scripts matter! -->
+	<script	src="/home/exampletenant/app/admin/web/js/models/entity-list-search/FullTextSearchableEntity.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/models/entity-list-search/FullTextSearchableEntityStatus.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/collections/entity-list-search/FullTextSearchableEntities.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/entity-list-search/FullTextSearchableEntity.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/entity-list-search/FullTextSearchableEntities.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/entity-list-search/FullTextSearchableEntityStatus.js"></script>
+	<script	src="/home/exampletenant/app/admin/web/js/views/entity-list-search/EntityListSearchConfiguration.js"></script>
+	<!-- /Entity List Search -->
+	</head>
+<body>
+
+	<div class="header">
+		<div class="logo logo-ot-appworks"></div>
+		<div class="icon user">
+			<span class="user-initials"></span>
+			<div class="menu-box user-menu">
+				<div class="menu-item" id="userId"></div>
+				<div class="menu-item" id="signout"></div>
+			</div>
+		</div>
+	</div>
+	<div class="alert alert-danger" id="alertDialog">
+		<span class="close">&times;</span> <strong id="errorTitle"></strong>
+		<p id="errorText"></p>
+	</div>
+
+	<div class="main"></div>
+
+	<div id="logoutModal" class="logoutModal" data-backdrop="static"
+		data-keyboard="false">
+		<div></div>
+	</div>
+	
+	<div id="sessionDialog-Block" role="dialog" style="display:none"> 
+		<div id="sessionDialog-Container">
+			<div id="sessionDialog-Header">
+				<div id="sessionDialog-WarnIcon"></div>
+				<h5 id="sessionTimeOutMessage"></h5>
+			</div>
+			<div id="logoutMessage" ></div>
+			<div id="sessionDialog-footer">
+				<button id="stayConnected" class="buttonFooter" tabindex="1"  onclick="stayConnected()" ></button> 
+				<button id="logOut" class="buttonFooter"  data-toggle="tooltip" data-container="body" onclick="logout()" ></button>
+			</div>		 
+		</div>
+	</div>
+	
+
+	<script>
+	    	var ADMIN={
+	    				"version":"25.1",
+	    				"culture":"en-US",
+	    				"serviceUrl":"/home/exampletenant/app/entityRestService/",
+	    				"applicationPath":"/home/exampletenant/app/admin/web"};
+
+	    	$(document).attr("title", Globalize.localize("admin.config.Title"));
+	    	$('#stayConnected').attr("title", Globalize.localize("admin.config.Stayconnected"));
+	    	$('#stayConnected').text(Globalize.localize("admin.config.Stayconnected"));
+	    	$('#logOut').text(Globalize.localize("admin.config.Logoff"));
+	    	$('#signout').text(Globalize.localize("admin.config.Logoff"));
+	    	$('#sessionTimeOutMessage').text(Globalize.localize("admin.config.SessionTimeOutMessage"));  
+	    	$('#logOut').attr("title", Globalize.localize("admin.config.Logoff"));
+	    	$('#userId').text(DOMPurify.sanitize("AppWorks Admin"));
+	    	$('#userId').css("font-weight","Bold");
+
+	</script>
+
+	<script type="text/javascript">
+		
+		$(document).ready(function(){		
+			$(".close").click(function(){
+				$("#alertDialog").hide();
+			});
+			ot_App.solutionManager.getAutoLogoutDuration(function(autoLogoutTime){
+				if (autoLogoutTime !== 0) {
+					initInterval(autoLogoutTime);
+				}
+			});
+			
+			 $(".header .user-initials").text(getInitials()).attr("title", Globalize.localize("admin.config.avatar"));
+		});
+		
+		function getInitials() { 
+			var fullname = DOMPurify.sanitize("AppWorks Admin");
+			names = fullname.split(" ");
+			var initials = names[0].substring(0, 1);
+			if (names.length == 1) {
+				initials += names[0].substring(1, 2);
+			} else {
+				initials += names[names.length - 1].substring(0, 1);
+			}
+			return initials.toUpperCase();
+		}
+		
+		$("#signout").on("click", function(evt) {
+			ot_App.doLogout();
+		});
+		
+		$(".icon .menu-box").parent().on("click", function(evt) {
+			if ($(evt.target).is(":input")) {
+				evt.stopPropagation();
+				return;
+			}
+			$(this).toggleClass("open").siblings(".open").removeClass("open");
+			var position = this.offsetLeft + this.offsetWidth - $(this).find(".menu-box")[0].offsetWidth;
+			$(this).find(".menu-box").css("left", position);
+			evt.stopPropagation();
+		});
+		
+		$("body").on("click", function(evt) {
+			if ($(evt.target).closest(".menu-box").closest(".page-header").length == 0) {
+				$(".icon.open").removeClass("open");
+			}
+			
+			if(evt.target.id === "solutions-cfg-panel-icon"){
+				$(".solutions-cfg-panel-icon").toggleClass("open");
+				return;
+			}
+			
+			if($("#solutions-cfg-panel-icon").attr('class').valueOf() === ("solutions-cfg-panel-icon open")){
+				$(".solutions-cfg-panel-icon.open").removeClass("open");
+			}
+				
+			if(evt.target.id === "configurable-elements-panel-icon"){
+				$(".configurable-elements-panel-icon").toggleClass("open");
+				return;
+			}
+			
+			if($("#configurable-elements-panel-icon").attr('class').valueOf() === ("configurable-elements-panel-icon open")){
+				$(".configurable-elements-panel-icon.open").removeClass("open");
+			}
+			
+			if(evt.target.id === "metadata-configurations-panel-icon"){
+				$(".metadata-configurations-panel-icon").toggleClass("open");
+				return;
+			}
+			
+			if($("#metadata-configurations-panel-icon").attr('class').valueOf() === ("metadata-configurations-panel-icon open")){
+				$(".metadata-configurations-panel-icon.open").removeClass("open");
+			}
+		});
+		
+	</script>
+
+	<script src="/home/exampletenant/app/admin/web/js/ajax.js"></script>
+
+	<script class="template" id="layout" type="text/template">
+			
+				<div id="Admin-Layout" class="col-container">
+        			<div class="col">
+						<div class="solutions-panel-heading">
+								<div class="dropdown pull-right">
+            						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="solutions-cfg-panel-icon" class="solutions-cfg-panel-icon"></span></a>
+            						<ul class="dropdown-menu" role="menu" id="actionMenu">
+                						<li id="deleteAction" class="disabled"><a href="#" class="delete"><%= Globalize.localize("admin.config.DeleteMenu") %></a></li>
+                						<li id="restAPIAction" style="display:none"><a target= "_blank" href="#" class="restAPI"><%= Globalize.localize("admin.config.RestAPI") %></a></li>
+                						<li id="viewSolutionAction" class="disabled"><a href="#" class="viewSolution"><%= Globalize.localize("admin.config.ViewSolutionMenu") %></a></li>
+                                        <li id="exportSolutionAction" class="disabled"><a href="#" class="exportSolution"><%= Globalize.localize("admin.config.ExportSolutionMenu") %></a></li>
+                                        <li id="downloadiHubDataDesignAction" class="disabled"><a href="#" class="downloadiHubDataDesign"><%= Globalize.localize("admin.config.iHub.ExportiHubDataObject") %></a></li>
+										<li id="publishSolutionAction" class="disabled"><a href="#" class="publishSolution"><%= Globalize.localize("admin.config.PublishSolutionMenu") %></a></li>
+                						<li id="deleteConfigurationAction" class="disabled"><a href="#" class="deleteConfiguration"><%= Globalize.localize("admin.config.DeleteConfigurationMenu") %></a></li>
+
+            						</ul>
+
+        						</div>
+        						<h3 class="solutions-panel-title"><%= Globalize.localize("admin.config.Solutions") %></h3>
+							</div>
+
+							<table class="admin-layout-table-droplist" style="margin-top:50px;">
+								<tr>
+									<td class="showSolutionsDeployedTo">
+										<%= Globalize.localize("admin.config.ShowSolutionsDeployedTo")%>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="pull-left" >
+											<select id="orgSelection">
+												<option value="Organization"><%= Globalize.localize("admin.config.Organization") %></option>
+												<option value="Shared"><%= Globalize.localize("admin.config.Shared") %></option>
+											</select>
+										</div>
+									</td>
+								</tr>
+							</table>
+							<table class="admin-layout-table-droplist" id="show-config-droplist" style="display:none">
+								<tr>
+									<td class="showConfigFor">
+										<%= Globalize.localize("admin.config.ShowConfigFor")%>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="pull-left">
+											<select id="configSelection">
+												<option value="AllOrgs"><%= Globalize.localize("admin.config.AllOrgs") %></option>
+												<option value="SystemOrg"><%= Globalize.localize("admin.config.SystemOrg") %></option>
+											</select>
+										</div>
+									</td>
+								</tr>
+							</table>
+							<div class="solutions-panel-body">
+								<div id="solutions"></div>
+							</div>
+					</div>
+        			<div class="configurable-elements-panel-col">
+						<div class="configurable-elements-panel-heading">
+							
+								<div class="dropdown pull-right">
+            						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="configurable-elements-panel-icon" class="configurable-elements-panel-icon"></span></a>
+            						<ul class="dropdown-menu" role="menu" id="elementActionMenu">
+                						<li id="elementDeleteAction" class="disabled"><a href="#" class="deleteElement"><%= Globalize.localize("admin.config.DeleteMenu") %></a></li>
+            						</ul>
+        						</div>
+        						<h3 class="configurable-elements-panel-title"><%= Globalize.localize("admin.config.EntityConfigurations") %></h3>
+							</div>
+
+							<div  class="panel-body" id="panelBody">
+								<div id="configurations"></div>
+							</div>
+						</div>
+		       		<div class="configuration-prop-panel-col">
+						<div class="configuration-prop-panel-heading">
+													
+								<div class="dropdown pull-right" id="docTypeActionMenu" hidden>
+            						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="metadata-configurations-panel-icon" class="metadata-configurations-panel-icon"></span></a>
+            						<ul class="dropdown-menu" role="menu" >
+                						<li id="configDefaultDocType" ><a href="#" id="docLink" class="configDefault"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.ManageConfiguration") %></a></li>
+            						</ul>
+								</div>
+								<h3 id="right-panel-heading" class="configuration-prop-panel-title"><%= Globalize.localize("admin.config.EntityConfigurationProperties") %></h3>
+							</div>
+
+							<div id="replace-revert-toolbar" class="property-toolbar">
+								<div id="replaceRevertButtons"></div>
+							</div>
+
+							<div id="property-toolbar" class="property-toolbar"></div>
+							<div class="panel-body">
+								<div id="configuration"></div>
+							</div>
+					</div>
+					<div class="default-panel">
+						<p class="selectSolution"><%= Globalize.localize("admin.config.SelectSolution") %></p>
+					</div> 
+					
+      			</div>
+		</script>
+
+	<script id="replace-revert-buttons" class="template" type="text/template">
+		<div>
+			<div id="stripingReplaceButton" <%= this.model.getReplaceButtonDisplayStyle() %> >
+				<span class=replace-revert-caption><%= Globalize.localize("admin.config.Striping.replaceButtonHint") %></span>
+				<button class="btn btn-primary btn-primary-line" id="striping-replace-button"><%= Globalize.localize("admin.config.Striping.replaceButtonLabel") %></button>
+				<hr class="btn-primary-line">
+			</div>
+			<div id="stripingRevertButton" <%= this.model.getRevertButtonDisplayStyle() %> >
+				<span class=replace-revert-caption><%= Globalize.localize("admin.config.Striping.revertButtonHint") %></span>
+				<button class="btn btn-primary btn-primary-line" id="striping-revert-button"><%= Globalize.localize("admin.config.Striping.revertButtonLabel") %></button>
+				<hr class="btn-primary-line">
+			</div>
+		</div>
+	</script>
+	
+	<script id="solutions-template" class="template" type="text/template">
+		<div class="list-group solutionsPanel">
+			<% var self = this, tenantVersionId = this.model.get('containerVersionId');
+				_.each(this.model.get("solutions"), function(solution){ %>
+			
+					<div class="solution">
+						<% if (solution.definition.info.containerVersions.length > 0) { %>
+							<a href="#" class="list-group-item solution-item" id="W<%= solution.definition.referencedSolutionId %>"
+									data-solutionId="<%= solution.definition.referencedSolutionId %>"
+									data-workspaceId="<%= solution.id%>"
+									data-versionId="<%= solution.definition.info.containerVersions[0].id%>"
+									data-tenantVersionId="<%= tenantVersionId %>">
+								<span class="workspace-name" title="<%= solution.displayName %>"><%= solution.displayName %></span>
+
+								<% if (solution.usage.hasErrors || solution.usage.errorCount > 0) { %>
+									<span class="pull-right"><img src="/home/exampletenant/app/admin/web/images/status_errors.svg" title="<%= Globalize.localize("admin.config.SolutionHasErrors") %>" alt="<%= Globalize.localize("admin.config.SolutionHasErrors") %>" width="16" height="16"></span> 
+								<%} else if (!solution.usage.isActive) { %>
+									<span class="pull-right"><img id="IMG<%= solution.definition.referencedSolutionId %>" src="/home/exampletenant/app/admin/web/images/status_inactive.svg" title="<%= Globalize.localize("admin.config.SolutionIsNotActive") %>" alt="<%= Globalize.localize("admin.config.SolutionIsNotActive") %>" width="16" height="16"></span>  
+								<%} else if (solution.usage.warningCount > 0) { %>
+									<span class="pull-right"><img id="IMG<%= solution.definition.referencedSolutionId %>" src="/home/exampletenant/app/admin/web/images/status_warnings.svg" title="<%= Globalize.localize("admin.config.SolutionHasWarnings") %>" alt="<%= Globalize.localize("admin.config.SolutionHasWarnings") %>" width="16" height="16"></span>  
+								<%} else { %>
+									<span class="pull-right"><img class="status-image" id="IMG<%= solution.definition.referencedSolutionId %>"src="/home/exampletenant/app/admin/web/images/status_active.svg" title="<%= Globalize.localize("admin.config.SolutionIsActive") %>" alt="<%= Globalize.localize("admin.config.SolutionIsActive") %>" width="16" height="16"></span>  
+								<%} %>
+							</a>
+						<%} else { %>
+							<a href="#" class="list-group-item solution-item" id="W<%= solution.definition.referencedSolutionId %>"
+									data-solutionId="<%= solution.definition.referencedSolutionId %>"
+									data-workspaceId="<%= solution.id%>"
+									data-versionId="NoVersionAvailable"
+									data-tenantVersionId="<%= tenantVersionId %>">
+								<span class="workspace-name"><%= solution.displayName %></span>
+							</a>
+						<%} %>
+					</div>
+			
+			<% }); %>
+		</div>
+	</script>
+
+	<script id="create-toolbar-template" type="template" class="template">
+			<div id="create-property-toolbar" class="configuration-toolbar">
+				<button class="btn btn-primary" id="create-ad-hoc-property-button"><%= Globalize.localize("admin.config.CreateButton") %></button>
+			</div>
+	</script>
+
+	<script id="configuration-template" type="template" class="template">
+			<div>
+				<% var configuration = this.model.get("configuration"); %>
+				<% if (configuration !== null && configuration.current != null) { %>
+					<% configuration = configuration.current; %>
+					<form role="form" class="config-form">
+                        <div class="form-group has-feedback">
+							<label for="webGatewayUri"><%= Globalize.localize("admin.config.WebGatewayUri") %></label>
+							<input type="text" class="form-control" id="webGatewayUri" placeholder="http://localhost/home/system/" value="<%= configuration.definition.webGatewayUri %>">
+   		      				<i class="glyphicon glyphicon-globe form-control-feedback"></i>
+						</div>
+   						<div class="form-group">
+      						<label for="organization"><%= Globalize.localize("admin.config.Organization") %></label>
+      						<input type="text" class="form-control" id="organization" placeholder="o=system,cn=cordys,cn=defaultInst,o=" value="<%= configuration.definition.organization %>">
+   						</div>
+					</form>
+				 <% } %>
+      	   </div>
+	</script>
+
+	<script id="configurations-template" type="template" class="template">
+				<% if (this.model.canShowPanel()) { %>
+					<div class="list-group configurationsPanel">
+						<% var self = this, configurations = this.model.get("configurations"); %>
+					<!-- Solution Status -->
+					<% if (this.model.canShowSolutionStatus()) { %>
+						<div class="list-group-item  accordion-group expandConfiguration" id='solutionState'>
+							<div class="accordion-heading">
+								<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#solutionState' href='#solutionStateCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.SolutionState") %>
+										</span>
+									</a>
+								</h6>
+							</div> 
+							<div id='solutionStateCollapseOne' class="panel-collapse collapse">
+								<div class="accordion-inner">
+									<% if (this.model.canShowAvailability()) { %>
+										<a href="#" class="list-group-item solution-availability" data-toggle="tooltip" data-placement="right"  title="<%= Globalize.localize("admin.config.SolutionAvailability") %>">
+											<span></span>&nbsp;&nbsp;<%= Globalize.localize("admin.config.SolutionAvailability") %>
+										</a>
+									<% } %>
+                                     
+									<% if (this.model.canShowErrorsAndWarnings()) { %>                   
+										<a href="#" class="list-group-item solution-advisor" data-toggle="tooltip" data-placement="right"  title="<%= Globalize.localize("admin.config.SolutionErrorsAndWarnings") %>">
+										<span></span>&nbsp;&nbsp;<%= Globalize.localize("admin.config.SolutionErrorsAndWarnings") %>
+										</a>  
+  									<% } %>  
+
+									<% if (this.model.canShowPendingDDL()) { %>                   
+										<a href="#" class="list-group-item solution-pending-statements" data-toggle="tooltip" data-placement="right"  title="<%= Globalize.localize("admin.config.PendingDDLStatements") %>">
+										<span></span>&nbsp;&nbsp;<%= Globalize.localize("admin.config.PendingDDLStatements") %>
+										</a>  
+  									<% } %>                                                    
+                                                  
+								</div>
+							</div>
+						</div> 
+					<% } %>
+
+					<!-- Solution securtiy -->
+					<% if (this.model.canShowSolutionConfigurationSecurityPolicy()) { %>
+						<div class="list-group-item  accordion-group expandConfiguration" id='solutionSecurity'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#solutionSecurity' href='#solutionSecurityCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.SolutionSecurity") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='solutionSecurityCollapseOne' class="panel-collapse collapse">
+								<div class="accordion-inner">
+									<% _.each(this.model.get("productionConfigurationPermissions"), function (permission) { %>
+										<a href="#" class="list-group-item solution-security" data-permission-name="<%=permission.name %>" data-toggle="tooltip" data-placement="right"  title="<%= permission.niceName %>">
+											<span></span>&nbsp;&nbsp;<%= permission.niceName %>
+										</a>
+									<% }) %>
+								</div>
+							</div>
+						</div>
+					<% } %>
+
+					<!-- Worklists -->
+					<% if (this.model.canShowWorklists()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='worklistSecurity'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#worklistSecurity' href='#worklistSecurityCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.WorklistSecurity") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='worklistSecurityCollapseOne' class="panel-collapse collapse">
+								<div class="accordion-inner">
+									<%_.each(this.model.get("worklists"), function (worklist) { %>
+										<a href="#" class="list-group-item element-to-secure" id="<%= worklist.id %>" data-elementId="<%= worklist.id %>" data-toggle="tooltip" data-placement="right"  title="<%= worklist.qualifiedDisplayName %>">
+											<span></span>&nbsp;&nbsp;<%= worklist.qualifiedDisplayName %>
+										</a>
+									<% }) %>
+								</div>
+							</div>
+						</div>
+					<% } %>
+
+					<!-- Layouts -->
+					<% if (this.model.canShowLayouts()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='homePageSecurity'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#homePageSecurity' href='#homePageSecurityCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.HomePageSecurity") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='homePageSecurityCollapseOne' class="panel-collapse collapse">
+								<div class="accordion-inner">
+									<%_.each(this.model.get("layouts"), function (layout) { %>
+										<a href="#" class="list-group-item element-to-secure" id="<%= layout.id %>" data-elementId="<%= layout.id %>" data-toggle="tooltip" data-placement="right"  title="<%= layout.displayName %>">
+											<span></span>&nbsp;&nbsp;<%= layout.displayName %>
+										</a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+
+					<!-- Entities -->
+					<% if (this.model.canShowEntities()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='entities'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#entities' href='#entitiesCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.Entities") %>
+										<span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='entitiesCollapseOne' class="accordion-body collapse">
+      							<div class="accordion-inner">
+									<%_.each(this.model.get("entities"), function (entity) { %>
+										<a href="#" class="list-group-item entity-selected" data-toggle="tooltip" data-placement="right"  title="<%= entity.displayName %>" id="<%= entity.id %>" data-elementId="<%= entity.id %>" >
+											<span></span>&nbsp;&nbsp;<%= entity.displayName %>
+										</a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+
+					<!-- External Entities -->
+					<% if (this.model.canShowExternalEntities()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='externalEntities'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#externalEntities' href='#externalEntitiesCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.ExternalEntities") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='externalEntitiesCollapseOne' class="accordion-body collapse">
+      							<div class="accordion-inner">
+									<%_.each(this.model.get("externalEntities"), function (externalEntity) { %>
+										<a href="#" class="list-group-item get-eisRepository-reference" id="<%= externalEntity.id %>" data-elementId="<%= externalEntity.id %>" data-toggle="tooltip" data-placement="right"  title="<%= externalEntity.displayName %>">
+											<span></span>&nbsp;&nbsp;<%= externalEntity.displayName %>
+										</a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+
+					<!-- History logs -->
+					<% if (this.model.canShowHistoryLogs()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='historyLogs'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#historyLogs' href='#historyLogsCollapseOne'>
+										<span class="accordian-toggle-text">										
+											<%= Globalize.localize("admin.config.HistoryLogs") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='historyLogsCollapseOne' class="accordion-body collapse">
+      							<div class="accordion-inner">
+									<%_.each(this.model.get("historyLogs"), function (historyLog) { %>
+										<a href="#" class="list-group-item historyLog-to-delete" id="<%= historyLog.id %>" data-elementId="<%= historyLog.id %>" data-toggle="tooltip" data-placement="right"  title="<%= historyLog.displayName %>">
+											<span></span>&nbsp;&nbsp;<%= historyLog.displayName %>
+										</a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+					
+					<!-- Email Configurations -->
+					<% if (this.model.get("emailConfigurations").length > 0) { %>
+					<div class="list-group-item accordion-group expandConfiguration" id='emailConfigurations'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#emailConfigurations' href='#emailConfigurationsCollapseOne'>
+										<span class="accordian-toggle-text">	
+											<%= Globalize.localize("admin.config.EmailConfigurations") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='emailConfigurationsCollapseOne' class="accordion-body collapse">
+      							<div class="accordion-inner">
+									<%_.each(this.model.get("emailConfigurations"), function (emailConfiguration) { %>
+										<a href="#" class="list-group-item email-configuration-item" id="<%= emailConfiguration.id %>" data-toggle="tooltip" data-placement="right"  title="<%= emailConfiguration.displayName %>" data-elementId="<%= emailConfiguration.id %>"><%= emailConfiguration.displayName %></a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+
+					<!-- Archive Policy -->
+					<% if (this.model.get("archivePolicyConfigurations").length > 0) { %>
+					<div class="list-group-item accordion-group expandConfiguration" id='achivePolicyConfigurations'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#archivePolicyConfigurations' href='#archivePolicyConfigurationsCollapseOne'>
+										<span class="accordian-toggle-text">	
+											<%= Globalize.localize("admin.config.ArchivePolicyConfiguration") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='archivePolicyConfigurationsCollapseOne' class="accordion-body collapse">
+      							<div class="accordion-inner">
+									<%_.each(this.model.get("archivePolicyConfigurations"), function (archivePolicyConfiguration) { %>
+										<a href="#" class="list-group-item archive-configuration" id="<%= archivePolicyConfiguration.id %>" data-toggle="tooltip" data-placement="right"  title="<%= archivePolicyConfiguration.name %>" data-elementId="<%= archivePolicyConfiguration.id %>"><%= archivePolicyConfiguration.name %></a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+
+					<!-- Content Configuration -->
+					<% if (this.model.canShowContentConfiguration() || this.model.canShowBWConfigurationReport() || this.model.canShowCoreContentConfiguration()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='content-entities'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#content-entities' href='#ContentConfigCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.ContentConfiguration") %>
+										<span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='ContentConfigCollapseOne' class="accordion-body collapse">
+								<% if (this.model.canShowContentConfiguration() || this.model.canShowBWConfigurationReport() || this.model.canShowCoreContentConfiguration()) { %>
+      							<div class="accordion-inner">
+									<span><b><%= Globalize.localize("admin.config.Entities") %></b><span>
+									<%_.each(this.model.get("contentEntities"), function (entity) { %>
+										<a href="#"  class="list-group-item content-entity-selected" id="<%= entity.id %>" data-toggle="tooltip" data-placement="right"  title="<%= entity.displayName %>" data-elementId="<%= entity.id %>">
+											<span></span>&nbsp;&nbsp;<%= entity.displayName %>
+										</a>
+									<% }) %>
+								</div>
+								<br>
+								<% } %>
+								<!-- BusinessWorkspace Configuration -->
+								<% if (this.model.canShowBWConfigurationReport()) { %>
+									<div class="accordion-inner">
+									<span><b><%= Globalize.localize("admin.config.Report") %></b><span>
+									<a href="#" class="list-group-item bwsConfiguration" id="bwsConfiguration" data-toggle="tooltip" data-placement="right"  title="<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceConfigurationReport")%>">
+										<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceConfigurationReport") %>
+									</a>
+								</div>
+								<% } %>
+                         </div>	
+						</div>
+					<% } %>
+
+					<!-- Entity List Search Configuration -->
+					<div class="list-group-item accordion-group expandConfiguration" id='search-entity'>
+						<div class="accordion-heading">
+							<h6 class="panel-title">
+								<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#content-entities' href='#SearchConfigurationCollapse'>
+									<span class="accordian-toggle-text">
+										<%= Globalize.localize("admin.config.Entities.FullTextSearchConfiguration") %>
+									<span>
+								</a>
+							</h6>
+						</div>  
+						<div id='SearchConfigurationCollapse' class="panel-collapse collapse">
+							<div class="accordion-inner">
+								<a href="#" class="list-group-item search-configuration" data-toggle="tooltip" data-placement="right" title="<%= Globalize.localize("admin.config.Entities.FullTextSearchConfiguration") %>">
+									<span></span>&nbsp;&nbsp;<%= Globalize.localize("admin.config.Entities.FullTextSearchConfiguration") %>
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<!-- Database References -->
+					<% if (this.model.canShowDatabaseReferenceDefinitions()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='databaseReferenceConfigurationNames'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#databaseReferenceConfigurationNames' href='#databaseReferenceConfigurationNamesCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.DatabaseReferences") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='databaseReferenceConfigurationNamesCollapseOne' class="accordion-body collapse">
+      							<div class="accordion-inner">
+									<%_.each(this.model.get("databaseReferenceDefinitions"), function (databaseReferenceDefinition) { %>
+										<a href="#" class="list-group-item database-reference" id="<%= databaseReferenceDefinition.id %>" data-elementId="<%= databaseReferenceDefinition.id %>" data-toggle="tooltip" data-placement="right"  title="<%= self.model.getDatabaseReferenceDisplayName(databaseReferenceDefinition.id)%>">
+											<span></span>&nbsp;&nbsp;<%= self.model.getDatabaseReferenceDisplayName(databaseReferenceDefinition.id) %>
+										</a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+
+					<!-- EISRepository Reference -->
+						<% if (this.model.canShowEisReferenceDefinitions()) { %>
+						<div class="list-group-item accordion-group expandConfiguration" id='eisRepositoryReferenceNames'>
+							<div class="accordion-heading">
+				   				<h6 class="panel-title">
+									<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#eisRepositoryReferenceNames' href='#eisRepositoryNamesCollapseOne'>
+										<span class="accordian-toggle-text">
+											<%= Globalize.localize("admin.config.EISRepositoryReference") %>
+										</span>
+									</a>
+				   				</h6>
+							</div> 
+							<div id='eisRepositoryNamesCollapseOne' class="accordion-body collapse">
+      							<div class="accordion-inner">
+									<%_.each(this.model.get("eisRepositoryReferenceDefinitions"), function (eisRepositoryReferenceDefinition) { %>
+										<a href="#" class="list-group-item eisRepository-Reference" id="<%= eisRepositoryReferenceDefinition.id %>" data-elementId="<%= eisRepositoryReferenceDefinition.id %>" data-toggle="tooltip" data-placement="right"  title="<%= eisRepositoryReferenceDefinition.displayName %>">
+											<span></span>&nbsp;&nbsp;<%= eisRepositoryReferenceDefinition.displayName %>
+										</a>
+									<% }) %>
+								</div>
+							</div>	
+						</div>
+					<% } %>
+
+					<!-- Content Repository Configuration -->
+					<% if (this.model.canShowContentRepositoryConfiguration()) { %>
+						<a href="#" class="list-group-item configuration-item content-repository-configuration" data-elementId="<%= this.model.get("solutionId") %>" data-toggle="tooltip" data-placement="right"  title="<%= Globalize.localize("admin.config.ContentRespository.ContentRespositoryConfiguration") %>">
+            				<span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;<%= Globalize.localize("admin.config.ContentRespository.ContentRespositoryConfiguration") %>
+						</a>
+					<% } %>
+
+					<!-- Configuration Properties -->
+					<% if (this.model.canShowConfigurationProperties()) { %>
+						<a href="#" class="list-group-item configuration-properties">
+							<div>
+								<img class="singleton-properties" src="/home/exampletenant/app/admin/web/images/application_configuration_bw.svg" width=20px height=20px
+									 title='<%= Globalize.localize("admin.config.ConfigurationProperties") %>'
+									 alt='<%= Globalize.localize("admin.config.ConfigurationProperties") %>'>
+								</img>
+								<%= Globalize.localize("admin.config.ConfigurationProperties") %> 
+							</div>							
+						</a>
+					<% } %>
+
+				<%} %>
+      	   </div>
+		</script>
+
+	<script id="entity-properties-template" type="template" class="template">
+		<div id="warningDailog" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" style="border: none;">
+						<button type="button" class="cancelLatestChanges close" aria-hidden="true">&times;</button>
+						<div style="display: -webkit-box;">
+							<img  src="/home/exampletenant/app/admin/web/images/status_warnings.svg" width=24 height=24 style="margin-top:20px"/>
+							<h3 data-bind="text: Globalize.localize("admin.config.CreateProperty")" style="margin-left:8px">Warning</h3>
+						</div>
+					</div>
+					<div class="modal-body">
+						<p id="warningMsg"></p>
+					</div>
+						<div class="modal-footer" id="warningAction" style="border-top: none;border-bottom: 4px solid #ff9f00;">
+							<button  data-dismiss="modal" type="button" class="btn btn-primary"  ><span>ok</span></button>
+						</div>
+						<div class="modal-footer" id="userConfirmationActions" style="border-top: none;border-bottom: 4px solid #ff9f00;">
+							<button type="button" class="btn btn-primary" id="saveLatestChanges" ><span>ok</span></button>
+							<button class="cancelLatestChanges btn btn-cancel">Cancel</button>
+						</div>
+				</div>
+			</div>
+		</div>
+
+		<!------------------        Brava configuration        ------------------->
+		<% if (this.model.canShowBravaConfiguration()) { %>
+			<div class="list-group">
+			<div class="list-group-item accordion-group" id='bravaConfigurations'>
+					<div class="accordion-heading">
+							<h6 class="panel-title">
+							<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#bravaConfigurations' href='#bravaConfigurationsCollapseOne'>
+								<span class="accordian-toggle-text">	
+									<%= Globalize.localize("admin.config.BravaConfiguration") %>
+								</span>
+							</a>
+							</h6>
+					</div> 
+					<div id='bravaConfigurationsCollapseOne' class="accordion-body collapse">
+							<div class="accordion-inner">
+							<div class="row">
+								<div class="col-md-8">
+									<div class="form-group">
+										<div class="controls">
+											<label><%= Globalize.localize("admin.config.BravaConfiguration.SelectBravaOperation") %></label>
+											<br>
+											<label class="iHub-entity-name-label">
+												<input class="form-control" type="radio" name="bravaOperation" id="bravaOperation_edit" value="MarkupEdit">
+												<label></label>
+												<span class="iHub-entity-name"><%= Globalize.localize("admin.config.BravaConfiguration.MarkupEditConfiguration") %></span>
+											</label>
+											<label class="iHub-entity-name-label">
+												<input class="form-control" type="radio" name="bravaOperation" id="bravaOperation_review" value="MarkupReview">
+												<label></label>
+												<span class="iHub-entity-name"><%= Globalize.localize("admin.config.BravaConfiguration.MarkupReviewConfiguration") %></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-8">
+									<div class="form-group">
+										<div class="controls">
+											<label for="bravaOperation"><%= Globalize.localize("admin.config.BravaConfiguration.SelectMarkupFile") %></label>
+											<select class="form-control" id="bravaMarkupConfigurationEdit" placeholder="select">
+												<option value=""><%- Globalize.localize("admin.config.SelectAEISRepositoryConfiguration") %></option>
+												<option value="Latest"><%- Globalize.localize("admin.config.BravaConfiguration.MarkupLatest") %></option>
+											</select>
+											<select class="form-control" id="bravaMarkupConfigurationReview" placeholder="select">
+												<option value=""><%- Globalize.localize("admin.config.SelectAEISRepositoryConfiguration") %></option>
+												<option value="All"><%- Globalize.localize("admin.config.BravaConfiguration.MarkupAll") %></option>
+												<option value="Latest"><%- Globalize.localize("admin.config.BravaConfiguration.MarkupLatest") %></option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-8">
+									<div class="form-group">
+										<div class="controls">
+											<label for="bravaToolbar"><%= Globalize.localize("admin.config.BravaConfiguration.SelectBravaToolbar") %></label>
+											<select class="form-control" id="bravaToolbarConfiguration" placeholder="select toolbar">
+												<option value=""><%- Globalize.localize("admin.config.SelectAEISRepositoryConfiguration") %></option>
+												<option value="Annotations"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.Annotation") %></option>
+												<option value="Redactions"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.Redaction") %></option>
+												<option value="Drawings"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.Drawings") %></option>
+												<option value="Changemarks"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.Changemarks") %></option>
+												<option value="Stamps"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.Stamps") %></option>
+												<option value="Lines"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.Lines") %></option>
+												<option value="Signatures"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.Signatures") %></option>
+												<option value="Text Editing"><%- Globalize.localize("admin.config.BravaConfiguration.Toolbar.TextEditing") %></option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-8">
+									<div class="form-group">
+										<div class="controls">				
+											<label for="bravaPageAlignment"><%= Globalize.localize("admin.config.BravaConfiguration.SelectPageAlignment") %></label>
+											<select class="form-control" id="bravaPageAlignment" placeholder="select page alignment">
+												<option value=""><%- Globalize.localize("admin.config.SelectAEISRepositoryConfiguration") %></option>
+												<option value="FitAll"><%- Globalize.localize("admin.config.BravaConfiguration.FitAll") %></option>
+												<option value="FitWidth"><%- Globalize.localize("admin.config.BravaConfiguration.FitWidth") %></option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>	
+				</div>
+			<% } %>
+		<!------------------        Brava configuration ends here       ------------------->
+
+		<!------------------        AX configuration       ------------------->
+		<% if (this.model.canShowAXProperties()) { %>
+			<div class="list-group-item accordion-group" id="axConfigurations">
+				<div class="accordion-heading"> <!-- AX configuration header -->
+					<h6 class="panel-title">
+						<a
+							class="accordion-toggle glyphicon glyphicon-chevron-down"
+							data-toggle="collapse"
+							href="#ax-configuration-body"
+							aria-expanded="false"
+							aria-controls="ax-configuration-body"
+							id="ax-configuration-header"
+						>
+							<span class="accordian-toggle-text">
+								<%= Globalize.localize("admin.config.AppEnhancer.AXApplicationConfiguration") %>
+							</span>
+						</a>
+					</h6>
+				</div> <!-- /AX configuration header -->
+				<div
+					class="accordion-inner accordion-body collapse in"
+					data-parent="#axConfigurations"
+					id='ax-configuration-body'
+				> <!-- AX configuration body -->
+					<div class="row"> <!-- AX application select -->
+						<div class="col-md-8">
+							<div class="form-group">
+								<label for="axApplication" class="form-check-label">
+									<%= Globalize.localize("admin.config.AppEnhancer.AXApplication") %>
+								</label>
+								<select class="form-control" name="ax-application" id="axApplication" placeholder="select">
+									<option value="" disabled selected>
+										<%= Globalize.localize("admin.config.AppEnhancer.SelectAXApplication") %>
+									</option>
+									<% _.each(this.model.get("axApplications").Application, function (eachAXApplication) { %>
+										<option value="<%- eachAXApplication.Name %>"><%- eachAXApplication.Name %></option>
+									<% }); %>
+								</select>
+							</div>
+						</div>
+					</div> <!-- /AX application select -->
+					<div class="row"> <!-- AX synchronize checkbox -->
+						<div class="col-md-8">
+							<div class="form-group">
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input" id="axSynchronizeManually" />
+									<label for="axSynchronizeManually" class="form-check-label">
+										<%= Globalize.localize("admin.config.AppEnhancer.AXSynchronizeManually") %>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div> <!-- /AX synchronize checkbox -->
+					<div class="row"> <!-- AX delete from repository checkbox -->
+						<div class="col-md-8">
+							<div class="form-group">
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input" id="axDeleteFromRepo" />
+									<label for="axDeleteFromRepo" class="form-check-label">
+										<%= Globalize.localize("admin.config.AppEnhancer.DeleteDocumentFromRepo") %>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div> <!-- /AX delete from repository checkbox -->
+					<div class="row" id="AXMapping" />
+				</div> <!-- /AX configuration body -->
+			</div>
+		<% } %>
+		<!------------------        AX configuration ends here       ------------------->
+
+		<!------------------        AE viewer configuration       ------------------->
+		<% if (this.model.canShowAXProperties()) { %>
+			<div class="list-group-item accordion-group" id="ae-viewer-configuration">
+				<div class="accordion-heading"> <!-- AE viewer configuration header -->
+					<h6 class="panel-title">
+						<a
+							class="accordion-toggle glyphicon glyphicon-chevron-right"
+							data-toggle="collapse"
+							href="#ae-viewer-configuration-body"
+							aria-expanded="false"
+							aria-controls="ae-viewer-configuration-body"
+							id="ae-viewer-configuration-header"
+						>
+							<span class="accordian-toggle-text">
+								<%= Globalize.localize("admin.config.AppEnhancer.AeViewerConfiguration") %>
+							</span>
+						</a>
+					</h6>
+				</div> <!-- /AE viewer configuration header -->
+				<div
+					class="accordion-inner accordion-body collapse"
+					data-parent="ae-viewer-configuration"
+					id='ae-viewer-configuration-body'
+				> <!-- AE viewer configuration body -->
+					<div class="row"> <!-- AX Readonly preview checkbox -->
+						<div class="col-md-12">
+							<div class="form-group">
+								<div class="form-check">
+									<input type="checkbox" class="readonly-preview-viewer" id="axReadOnlyPreview" />
+									<label for="axReadOnlyPreview" class="readonly-preview-viewer">
+										<%= Globalize.localize("admin.config.AppEnhancer.AXViewerConfiguration.ReadOnlyPreview") %>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label>
+									<%= Globalize.localize("admin.config.AppEnhancer.AeViewerParameters") %>
+								</label>
+								<div class="actions-bar" role="toolbar">
+									<button
+										class="btn add-row-button ae-row-action-button"
+										title="Add"
+									></button>
+									<button
+										class="btn delete-row-button ae-row-action-button"
+										title="Delete"
+									></button>
+									<button
+										class="btn edit-row-button ae-row-action-button"
+										title="Edit"
+									></button>
+								</div>
+							</div>
+						</div>
+					</div> <!-- /AE application select -->
+				</div> <!-- /AE viewer configuration body -->
+			</div>
+		<% } %>
+		<!------------------        AE viewer configuration ends here       ------------------->
+
+		<!------------------        XECM configuration starts here       ------------------->
+		<% if (this.model.canShowECMProperties()) { %>
+			<div class="list-group-item accordion-group" id='xecmConfigurations'>
+				<div class="accordion-heading">
+				   <h6 class="panel-title">
+						<a class="accordion-toggle glyphicon glyphicon-chevron-down" data-toggle="collapse" data-parent='#xecmConfigurations' href='#xecmConfigurationsCollapseOne'>
+							<span class="accordian-toggle-text">	
+							<%= Globalize.localize("admin.config.Entities.ExtendedECM.configuration") %>
+							</span>
+						</a>
+				   </h6>
+				   <br />
+				</div>
+				<div class="form-group xecm-properties-container">
+					<div class="controls">
+						<label><%= Globalize.localize("admin.config.Entities.ExtendedECM.CrossApplicationBWS") %></label>
+						<select class="form-control" id="cross-app-select">
+							<option value="None"><%- Globalize.localize("admin.config.Entities.XECM.None") %></option>
+						<% if (this.model.attributes.canShowLinkBWSConfiguration) { %>
+							<option value="Link"><%- Globalize.localize("admin.config.Entities.XECM.LinkBWS") %></option> 
+						<%} %>
+							<option value="Shared"><%- Globalize.localize("admin.config.Entities.XECM.SharedBWSCreation") %></option>                                        
+							<option value="Related"><%- Globalize.localize("admin.config.Entities.XECM.RelatedBWSCreation") %></option>
+						</select>
+					</div>
+				</div>
+				<div id='xecmConfigurationsCollapseOne' class="accordion-body collapse in">
+					<div class="list-group" id='cross-app-fields'>
+						<div class="form-group" id="ext-system-id">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.ExtendedECM.ExtSysID") %></label>
+							<input type="text" class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceMandatoryFields") %>">
+						</div>
+						<div class="form-group" id="workspace-id">
+							<label><font color="red">* </font><%= Globalize.localize("admin.config.Entities.ExtendedECM.WorkspaceTypeID") %></label>
+							<input type="text" class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceMandatoryFields") %>">
+						</div>
+						<div class="form-group" id="business-obj-type">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.ExtendedECM.BusinessObjType") %></label>
+							<input type="text" class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceMandatoryFields") %>">
+						</div>
+						<div class="form-group" id="search-expression">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.ExtendedECM.SearchExpression") %></label>
+							<input type="text" class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceMandatoryFields") %>">
+						</div>
+						<hr />
+						<div class="form-group">
+							<div id="crossApplicationMapping"></div>
+						</div>
+					</div>
+
+					<div class="list-group" id='cross-app-link-fields'>
+						<div class="form-group" id="link-bws-workspace-id">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.ExtendedECM.BusinessObjectTypeID") %></label>
+							<input type="text" class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceMandatoryFields") %>">
+						</div>
+						<div class="form-group" id="link-bws-search-expression">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.ExtendedECM.SearchExpression") %></label>
+							<input type="text" class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceMandatoryFields") %>">
+						</div>
+						<div class="form-group" id="create-bws-with-auto-sync">
+							<input type="checkbox" class="create-bws-with-auto-sync" />
+							<label class="create-bws-with-auto-sync"><%=Globalize.localize("admin.config.Entities.ExtendedECM.CreateWorspaceAutomatically") %></label>
+						</div>
+						<hr />
+						<div class="form-group">
+							<div id="linkMapping"></div>
+						</div>
+					</div>
+					<% if (this.model.canShowInstanceRoleMapping()) { %>
+					<div class="form-group">
+						<div id="rolesMapping"></div>
+					</div>
+					<% } %>
+				</div>
+			</div>
+		<% } %>
+		<!------------------        XECM configuration ends here       ------------------->
+
+		<!------------------        Core Content configuration starts here       ------------------->
+		<% if (this.model.canShowCoreContentConfiguration()) { %>
+			<div class="list-group-item accordion-group" id='coreContentConfigurations'>
+				<div class="accordion-heading">
+				   <h6 class="panel-title">
+						<a class="accordion-toggle glyphicon glyphicon-chevron-down" data-toggle="collapse" data-parent='#coreContentConfigurations' href='#coreContentConfigurationsCollapseOne'>
+							<span class="accordian-toggle-text">	
+							<%= Globalize.localize("admin.config.Entities.CoreContent.Configuration") %>
+							</span>
+						</a>
+				   </h6>
+				   <br />
+				</div>
+				<div id='coreContentConfigurationsCollapseOne' class="accordion-body collapse in">
+					<div class="form-group xecm-properties-container">
+						<div class="controls" id="core-content-app-select">
+							<label><%= Globalize.localize("admin.config.Entities.CoreContent.WorkspaceOperation") %></label>
+							<select class="form-control" id="workspace-operation-select">
+								<option value="" disabled selected>
+									<%= Globalize.localize("admin.config.Entities.CoreContent.SelectWorkspaceOperation") %>
+								</option>
+								<option value="None"><%- Globalize.localize("admin.config.None") %></option>
+								<option value="CreateNew"><%- Globalize.localize("admin.config.Entities.CoreContent.CreateNewWorkspace") %></option>
+								<option value="LinkWorkspace"><%- Globalize.localize("admin.config.Entities.CoreContent.LinkExistingWorkspace") %></option>
+							</select>
+						</div>
+					</div>
+					<div id='coreContentConfigurationView' class="list-group" style="display: none;">
+						<div id="workspace-type-control" class="form-group">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.CoreContent.WorkspaceType") %></label>
+							<select class="form-control" id="workspace-type-select">
+								<option value="" disabled selected>
+									<%= Globalize.localize("admin.config.Entities.CoreContent.SelectWorkspaceType") %>
+								</option>
+								<% _.each(workspaceTypes, function(element){%>
+									<option value='<%= element.name %>'><%= element.display_name %></option>
+								<% });%>
+							</select>
+						</div>
+						<div id="workspace-template-select-control" class="form-group">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.CoreContent.WorkspaceTemplate") %></label>
+							<select class="form-control" id="workspace-template-select">
+								<option value="" disabled selected>
+									<%= Globalize.localize("admin.config.Entities.CoreContent.SelectWorkspaceTemplate") %>
+								</option>
+								<% _.each(workspaceTemplatesForWorkpaceType, function(element){%>
+									<option value='<%= element.name %>'><%= element.display_name %></option>
+								<% });%>
+							</select>
+						</div>
+						<div id="workspace-name-control" class="form-group">
+							<label><%= Globalize.localize("admin.config.Entities.CoreContent.WorkspaceName") %></label>
+							<span id="workspaceNameTooltip" data-toggle="tooltip" class="help-bg-image" data-placement="right" data-i18n="title=Labeltip" title="<%= Globalize.localize("admin.config.Entities.CoreContent.WorkspaceNameTooltip") %>"></span>
+							<input type="text" id='workspace-name-input' class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.Entities.CoreContent.EnterWorkspaceName") %>">
+						</div>
+						<div id="search-expression-type-control" class="form-group" style="display: none;">
+							<label><font  color="red">* </font><%= Globalize.localize("admin.config.Entities.CoreContent.SearchExpression") %></label>
+							<input type="text" id='search-expression-input' class="form-control" required="true" placeholder="<%= Globalize.localize("admin.config.Entities.CoreContent.EnterSearchExpression") %>">
+						</div>
+						<div class="form-group" id="core-content-bws-link-create-workspace">
+							<input type="checkbox" class="create-bws-with-auto-sync" />
+							<label class="create-bws-with-auto-sync"><%=Globalize.localize("admin.config.Entities.CoreContent.CoreContentCreateWorkspaceAutomatically") %></label>
+						</div>
+						<hr />
+						<div class="form-group">
+							<div id="CoreContentMapping"></div>
+						</div>
+						<% if (this.model.canShowInstanceRoleMapping()) { %>
+							<hr />
+							<div class="form-group">
+								<div class="col-md-12">
+									<div id="coreContentInstanceRolesMapping"></div>
+								</div>
+							</div>
+							<% } %>
+							<br />
+					</div>
+				</div>
+				<div class="core-content-footer" style="display: none;">
+					<div class="col-md-2"> <!-- Core content properties map add button -->
+						<div class="form-group">
+							<button class="btn btn-primary" type="button" id="coreContentPublishBtn">
+								<%= Globalize.localize("admin.config.Entities.CoreContent.PublishButtonText") %>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		<% } %>
+		<!------------------        Core Content configuration ends here       ------------------->
+
+			<% if (this.model.canShowDatabaseReference()) { %>
+			<div id="databaseReferenceName">
+				<div>
+					<label for="database-reference-name"><%- Globalize.localize("admin.config.DatabaseReferenceName") %></label>
+				</div>				
+				<div>
+					<span><%- this.model.getDatabaseReferenceName() %></span>
+				</div>
+			</div>
+			<% } %>
+
+			<!------------------        Metadata configuration starts here       ------------------->
+			<% if (this.model.canShowMetadataConfigurator()) { %>
+				<div class="list-group-item accordion-group" id='metadataConfigurations'>
+						<div class="accordion-heading">
+							   <h6 class="panel-title">
+								<a class="accordion-toggle glyphicon glyphicon-chevron-down" data-toggle="collapse" data-parent='#metadataConfigurations' href='#metadataConfigurationsCollapseOne'>
+									<span class="accordian-toggle-text">	
+										<%= Globalize.localize("admin.config.Entities.MetadataConfigurations") %>
+									</span>
+								</a>
+							   </h6>
+						</div> 
+						<div id='metadataConfigurationsCollapseOne' class="accordion-body collapse in">
+							  <div class="accordion-inner">
+								<div id="metadataConfigurator">
+									<div class="row">
+										<div class="col-md-8">
+											<div class="form-group">
+												<div class="controls">
+													<label><%= Globalize.localize("admin.config.Entities.SelectMetadataType") %></label>
+													<select class="form-control" id="selectDocumentType" placeholder="select">
+														<option value="NothingSelected"><%- Globalize.localize("admin.config.Entities.MetadataConfigurations.selectDoctype") %></option>
+														<% _.each(documentTypes.DocumentType, function(element){%>
+															<option value='<%= element %>'><%= element %></option>
+														<% });%>	
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-8">
+											<div class="form-group">
+												<div class="controls">
+													<label><%= Globalize.localize("admin.config.Entities.SelectRenditions") %></label>
+													<input class="form-control" type='text' value='<%= this.model.get("selectedRendition").DisplayName %>' disabled>
+												</div>
+											</div>
+										</div><!-- /.col-md-5 -->
+					
+										<div class="col-md-4" style="margin-top: 25px;">
+											<div class="input-group">
+												<span class="input-group-btn">
+													<button id="browse-renditions-btn" class="btn btn-primary metadata-configuration-btn" type="button" disabled>
+														<%= Globalize.localize("admin.config.SelectButton") %>
+													</button>
+												</span>
+												<span class="input-group-btn">
+													<button id="remove-rendition-btn" class="btn btn-cancel metadata-configuration-btn" type="button" disabled>
+														<%= Globalize.localize("admin.config.Remove") %>
+													</button>
+												</span>
+											</div><!-- /input-group -->
+										</div><!-- /.col-md-3 -->
+									</div><!-- /.row -->
+									<div class="row">
+										<div class="col-md-8">
+											<div class="form-group">
+												<div class="controls">
+													<label><%= Globalize.localize("admin.config.Entities.SelectPropertiesDisplay") %></label>
+													<select class="form-control" id="entityPropertiesSelect" placeholder="select">
+														<option value='Default'><%- Globalize.localize("admin.config.Entities.PropertyConditionDefaultSelect") %></option>
+														<% _.each(documentTypesPropertiesConditions, function(element){ %>
+															<option value='if <%= element.PropertyName %> = <%= element.PropertyValue %>'>if <%= element.PropertyName %> = <%= element.PropertyValue %></option>
+														<% });%>	
+													</select>
+												</div>
+											</div>
+										</div><!-- /.col-md-5 -->
+					
+										<div class="col-md-4" style="margin-top: 25px;">
+											<div class="input-group">
+												<span class="input-group-btn">
+													<button id="manageConditions-btn" class="btn btn-primary metadata-configuration-btn" type="button">
+														Manage conditions												
+													</button>
+												</span>
+											</div><!-- /input-group -->
+										</div><!-- /.col-md-3 -->
+									</div><!-- /.row -->
+									<div class="select-properties-container">
+										<% _.each(documentTypesProperties.Property, function(element,index){ %>
+											<% if (index == 0) { %>
+											<div class="row selectProperties">
+												<div class="col-md-4">
+												<input type="checkbox" id='selectAll' class="selectAll">
+												<span style="font-weight: bold;"><%- Globalize.localize("admin.config.Entities.Selectall") %></span>
+												</div>
+												<div class="col-md-4">
+													<span class="readonly-label" style="font-weight: bold;"><%- Globalize.localize("admin.config.Entities.ReadOnly") %></span>
+												</div>
+												<div class="col-md-4">
+													<span class="required-label" style="font-weight: bold;"><%- Globalize.localize("admin.config.Entities.Required") %></span>
+												</div>							
+											</div>
+											<hr>
+											<% } %>
+											<div class="row selectProperties">
+												<div class="col-md-4">
+													<input type="checkbox" id='<%= element.Name %>' class="property-checkbox">
+													<span title='<%= element.Name %>'><%= element.DisplayName %></span>
+												</div>
+												<% if (!element.Readonly) { %>
+													<div class="col-md-4">
+														<input type="checkbox" name='<%= element.Name %>' class='<%= element.Name %> readonly-checkbox hidden'>
+													</div>
+													<div class="col-md-4">
+														<input type="checkbox" name='<%= element.Name %>' class='<%= element.Name %> required-checkbox hidden'>
+													</div>
+												<% } %>
+											</div>
+											<hr>
+										<% });%>	
+									</div>
+								</div>
+							</div>
+						</div>	
+					</div>
+				</div>
+			<% } %>
+			<!------------------        Metadata configuration ends here       ------------------->
+	</script>
+
+	<script id="database-reference-template" type="template"
+		class="template">
+			<div>
+				<div>
+					<label for="database-configuration-name"><%- Globalize.localize("admin.config.DatabaseConfigurationName") %></label>
+					<select id='availableDsos' name="properties" class="form-control">
+						<option value="dbrcNothingSelected" <%= this.model.isDsoSelected(null) %>><%- Globalize.localize("admin.config.SelectDatabaseConfiguration") %></option>
+						<% var self = this; _.each(this.model.getDsos(), function (dso) { %>
+							<option <%= self.model.isDsoSelected(dso) %> value='<%= dso.id %>' ><%= dso.name %></option>
+						<% }); %>
+					</select>
+				</div>
+				<div id="databaseConfigurationUsage">
+					<span><%= Globalize.localize("admin.config.DatabaseReferenceLegend") %></span>
+					<br></br>
+					<div>
+						<% var references = this.model.getDatabaseReferences(); %>
+						<% _.each(references, function (reference) { %>
+							<div class="list-group-item"><%- reference.solutionName %></div>
+							<% _.each(reference.entities, function (entity) { %>
+								<div class="list-group-item">&nbsp;&nbsp:&nbsp;&nbsp;<%- entity.entityName %></div>
+					   		<% }); %>
+					   	<% }); %>
+					</div>
+				</div>
+			</div>
+		</script>
+	
+	<script id="emailconfigconfiguration-template" type="template"
+		class="template">
+			<div>
+					<form role="form" class="config-form admin-config-panel emailConfiguration" autocomplete="off" id= "emailConfigurationForm">
+						<div class="form-group">
+							<label for="fromId"><%= Globalize.localize("admin.config.FromMailId") %></label>
+							<input type="text" <%= this.getDisabled() %> class="form-control" id="fromId" placeholder="Enter the sender's email address" value="">
+   		  				</div>
+   		  				<div class="form-group">
+							<label for="fromName"><%= Globalize.localize("admin.config.FromMailName") %></label>
+							<input type="text" <%= this.getDisabled() %> class="form-control" id="fromName" placeholder="" value="">
+   		  				</div>
+						<div class="form-group">
+					        <input type="checkbox" <%= this.getDisabled() %> name="optcheckName" id="chk" placeholder="" value="">
+							<label style="font-weight: normal;" for="chk"><%= Globalize.localize("admin.config.chk") %></label>
+   		 				</div>
+						<div class="form-group">
+							<label for="replyToId"><%= Globalize.localize("admin.config.ReplyToMailId") %></label>
+							<input type="text" <%= this.getDisabled() %> class="form-control" id="replyToId" placeholder="Enter the email address to which a recipient sends replies" value="">
+   		 				</div>
+						<div class="form-group">
+							<label for="emailProfileUserID"><%= Globalize.localize("admin.config.EmailProfileUserID") %></label>
+							<input type="text" <%= this.getDisabled() %> class="form-control" id="emailProfileUserID" placeholder="Enter the user ID of the profile for accessing the mail server" value="">
+   		 				</div>
+						<label><%= Globalize.localize("admin.config.LinkBusinessIdPrefix") %></label>
+						<div  id="businessIDPrefixesAndEntityListView">
+					 
+					 </div>
+   		 				
+   					</form>
+			   </div>
+		</script>
+		
+		<script id="archiveconfiguration-template" type="template" class="template">
+			<div>
+				<form role="form" class="config-form admin-config-panel archiveConfiguration" autocomplete="off" id= "archivePolicyConfigurationForm">
+						<div class="form-group">
+							<label for="retentionValue"><%= Globalize.localize("admin.config.archivePolicyHeading") %></label>
+							<input type="number" min="0" class="form-control" id="retentionValue" placeholder="Enter value" value="">
+							<div class="controls" style="display: inline-block;">
+								<select class="form-control" name="data-retention-type">
+									<option value="days" <%- this.daysSelected() %>><%- Globalize.localize("admin.config.archivedays") %></option>                                        
+									<option value="years" <%- this.yearSelected() %>><%- Globalize.localize("admin.config.archiveyears") %></option>
+								</select>
+							</div>
+   		  				</div>	
+   					</form>
+			</div>
+	     </script>
+		
+		<script id="businessIDprefixAndEnitityNameTemplate" type="template" class="template">
+			<div class='row addRowContainer' >
+				<div class='col-xs-12 addRowBtn'><button id='addbusineessIDAndEntityMapping' class='btn add-row-button ' title='Add' type='button'></button>
+				</div>
+			</div>
+			<div class='row' id="businessIDMappingLabelContainer" >
+				<div id="businessIDPrefixLabelContainerPart" class='col-xs-6'>
+					<span for='businessIDPrefix'><%= Globalize.localize('admin.config.BusinessIdPrefix') %></span>
+				</div>
+				<div id="entityNameLabelContainerPart" class='col-xs-6' >
+					<span for='entityQualifiedNames'><%= Globalize.localize('admin.config.EntityName') %></span>
+				</div>
+			</div>
+		</script>
+		
+	<script id="businessIDPrefixAndEntityTemplate" type="template" class="template">
+		<div class="action-row">
+			<% if (this.model.get("isSavedChanges")==false) { %>
+				<div id="businessIDPrefixContainer" class="col-xs-3 alignEmailWithBusinesIDRowContents">
+					<select   id="businessIDPrefixesList" >
+						<option value="" disabled selected hidden><%= Globalize.localize("admin.config.ChooseBusinessIdPrefix") %></option>
+						<% _.each(this.model.get("prefixes"), function(prefix){ %>
+						<option value='<%= prefix.name %>'><%= prefix.name %></option>
+						<% });%>
+						<option value="<%= Globalize.localize('admin.config.AddNewBusinessIDPrefix') %>" id="addNewBusinessIDPrefix">
+						<%= Globalize.localize("admin.config.AddNewBusinessIDPrefix") %> </option>
+					</select>
+					
+				</div >
+				<div class="col-xs-3 " id="newBusinessIDPrefixContainer" >
+					<input type="hidden" placeholder='<%= Globalize.localize("admin.config.NewPrefix") %>' class="form-control" id="newBusinessIDPrefix" value="" >
+				</div>
+						
+				<div id="entityNameContainer" class="col-xs-3 alignEmailWithBusinesIDRowContents">
+					<select  id="entityQualifiedNamesList" >
+						<option value="" disabled selected hidden><%= Globalize.localize("admin.config.ChooseEntity") %></option>
+						<% _.each(this.model.get("entities"), function(entity){ %>
+						<option value='<%=  entity.containerVersionID + "." + entity.entityElementId %>'><%= entity.name %></option>
+						<% });%>
+					</select>
+								
+				</div>
+						
+				<div id="saveAndCancelButtonContainer" class="col-xs-3 alignEmailWithBusinesIDRowContents">
+					<button id='saveBusinessIDAndEntityMapping'  type="button" class="btn btn-xs btn-primary actionButtonStyle" disabled  title="Save"><%= Globalize.localize("admin.config.SaveButton") %></button>
+					<button id='cancelBusinessIDAndEntityMapping' class="btn btn-xs btn-cancel actionButtonStyle" title="Cancel"><%= Globalize.localize("admin.config.CancelButton") %></button>
+					<button id='deleteBusinessIDAndEntityMapping' class="btn btn-xs btn-cancel actionButtonStyle hideButton" title="Delete"><%= Globalize.localize("admin.config.DeleteMenu") %></button>
+				</div>
+			<% } else { %>
+			 
+				 <div id="savedBusinessIDPrefixContainer" class="col-xs-3 alignEmailWithBusinesIDRowContents">
+					<select id="businessIDPrefixesList" disabled>
+						<option value='<%= this.model.get("businessIdPrefix") %>' selected ><%= this.model.get("businessIdPrefix") %></option>
+								
+					</select>
+				</div>
+				<div class="col-xs-3">
+				</div>
+				<div id="savedEntityNameContainer" class="col-xs-3 alignEmailWithBusinesIDRowContents">
+					<select  id="entityQualifiedNamesList" disabled>
+						<option value='<%= this.model.get("uniqueID") %>' selected ><%= this.model.get("entityName") %></option>
+					</select>
+								
+				</div>
+						
+				<div id="deleteAfterSaveContainer" class="col-xs-3 alignEmailWithBusinesIDRowContents">
+					<button id='deleteBusinessIDAndEntityMapping' class="btn btn-xs btn-cancel actionButtonStyle" title="Delete"><%= Globalize.localize("admin.config.DeleteMenu") %></button>
+				</div>
+			<% } %>
+		</div>
+		<div id="duplicate-businessid" class="duplicate-businessid-error-msg" style="display: none;"><%= Globalize.localize("admin.config.BusinessIdAlreadyExists") %></div>
+	</script>
+		
+		
+
+	<script id="contentRepositoryConfiguration-template" type="template" class="template">
+		<div id="property-list">
+			<table class="table table-condensed table-striped content-repository-table">
+				<thead>
+					<tr>
+						<th><%= Globalize.localize("admin.config.ContentRespository.Table.RepositoryType") %></th>
+						<th><%= Globalize.localize("admin.config.ContentRespository.Table.ContainerName") %></th>
+						<th><%= Globalize.localize("admin.config.ContentRespository.Table.ApplicationId") %></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="col-md-3"><input type="text" placeholder="Enter the name for mapping" class="repository-type form-control" /></td>
+						<td class="col-md-3">
+							<select id="selectRepositoryContainer" name="properties" class="form-control">
+							<option value="NothingSelected"><%- Globalize.localize("admin.config.ContentRespository.Table.SelectContainer") %></option>
+							<% _.each(this.model.get("contentRepoConfig"), function(groupConfiguration){ %>
+								 <option value='<%= groupConfiguration.ServiceGroupName %>'><%= groupConfiguration.ServiceGroupName %></option>
+							<% });%>
+							</select>
+						</td>
+						<td class="col-md-5"><span class="dn-inputbox"/></td>
+						<td class="col-md-1">
+							<button class="btn btn-primary" type="button" id="save-contentRepository-details" disabled>
+								<%= Globalize.localize("admin.config.SaveButton") %>
+							</button>
+							<button class="btn btn-default" type="button" id="delete-contentRepository-details">
+								<%= Globalize.localize("admin.config.DeleteMenu") %>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</script>
+
+	<script id="contentRepositoryDelete-template" type="template" class="template">
+			<div id = "content-repository-delete-dialog" class="modal fade" tabindex="-1">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header iHub-modal-header"">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h3 style="margin-top: 5px;"><span class="glyphicon glyphicon-question-sign" /><%= Globalize.localize("admin.config.ContentRespository.Dialog.Heading") %></h3>
+						</div>
+						<div class="modal-body">
+							<p><%= Globalize.localize("admin.config.ContentRespository.Dialog.WarningMessage") %></p>
+						</div>
+						<div class="modal-footer iHub-modal-footer">
+							<button id="content-repository-delete" class="btn btn-primary" data-dismiss="modal"><span><%= Globalize.localize("admin.config.DeleteMenu") %></span></button>
+							<button class="btn btn-cancel" data-dismiss="modal"><span><%= Globalize.localize("admin.config.CancelButton") %></span></button>
+						</div>
+					</div>
+				</div>
+			</div>
+	</script>
+	
+	<script id="eisRepositoryReference-template" type="template" class="template">
+		<div class="container-fluid">
+			<ul class="nav nav-tabs">
+  				<li class="active"><a class="eisRepositoryReferenceTabs" data-toggle="tab" href="#eisConnectorConfiguration">Configuration</a></li>
+  				<li><a class="eisRepositoryReferenceTabs" data-toggle="tab" href="#externalEisEntities">Entities</a></li>
+			</ul>
+		<div class="tab-content">
+			<div id="eisConnectorConfiguration" class="tab-pane fade in active">
+			<% if (this.model.get("canShowEisRepositoryReferenceDropdown")) { %>
+			<div>
+				<br>
+				<label for="eisConnector-name"><%= Globalize.localize("admin.config.SelectEISConnector") %></label>
+				<select id="availableEISConnectors" name="properties" class="form-control">
+					<option value="NothingSelected"><%- Globalize.localize("admin.config.SelectAEISConnector") %></option>
+					<% _.each(this.model.getEISConnectors(), function(eisConnector){ %>
+					 	<option value='<%= eisConnector.id %>'><%= eisConnector.displayName %></option>
+					<% });%>
+				</select>
+				<br>
+			</div>
+
+			<div>
+				<label for="eisRepositoryConfiguration-name"><%- Globalize.localize("admin.config.SelectEISRepositoryConfiguration") %></label>
+				<select id='availableEISRepositoryConfigurations' name="properties" class="form-control">
+					<option value="NothingSelected"><%- Globalize.localize("admin.config.SelectAEISRepositoryConfiguration") %></option>
+					<% var self = this;
+					   _.each(this.model.eisRepositoryConfigurations, function (eisRepositoryConfiguration) { %>
+						<option value='<%= eisRepositoryConfiguration.id %>' ><%= eisRepositoryConfiguration.name %></option>
+					<% }); %>
+				</select>
+			</div>
+			<% } %>
+			<br>
+			<form>
+				<div class="form-group">
+	                <button type="button" id="synchEISRepository" class="btn btn-primary" style="display:none"><%= Globalize.localize("admin.config.synchRepository") %></button>
+				</div>
+			</form>
+			</div>
+		<div id="externalEisEntities" class="tab-pane fade">
+			<div id="eisConfigurationUsage">
+					<br>
+					<label><span><%= Globalize.localize("admin.config.EisRepositoryReferenceLegend") %></span></label>
+					<br></br>
+					<div>
+						<% var references = this.model.getExternalEntities(); %>
+						<% _.each(references, function (reference) { %>
+							<div class="list-group-item"><%- reference.solutionName %></div>
+							<% _.each(reference.entities, function (entity) { %>
+								<div class="list-group-item">&nbsp;&nbsp;&nbsp;<%- entity.entityName %></div>
+					   		<% }); %>
+					   	<% }); %>
+					</div>
+				</div>
+			</div>
+		</div>
+	</script>
+	<script id="EisReference-template" type="template" class="template">
+		<div id="eisReferenceUsage">
+			<div>		
+				<label for="eis-repository-reference-name"><span><%= Globalize.localize("admin.config.EISRepositoryReferenceToEntity") %></span></label
+			</div>
+			<div>
+				<% var eisRepositoryReference = this.model.getAssociatedEISRepositoryReference(); %>
+				<div><span><%- eisRepositoryReference.eisRepositoryReference %></span></div>
+			</div>			
+		</div>
+	</script>
+	<script id="property-item-template" type="template" class="template">
+			<td>
+				<input class="item-name" <%=this.getReadOnly() %> id="property-name" value="<%= this.model.get("name") %>" type="text">
+			</td>
+			<td>
+				<input class="item-value" <%=this.getReadOnly() %> id="property-value" value="<%= this.model.get("value") %>" type="text">
+			</td>
+			<td>
+				<img id="remove-property-button" class="glyphicon btn-remove-property <%=this.getHidden() %>" src="/home/exampletenant/app/admin/web/images/delete.svg" width=24 height=24></img>
+			</td>
+		</script>
+
+	<script id="ad-hoc-property-item-template" type="template"
+		class="template">
+			<div id="property-item">
+				<input for="Name" id="property-name" value="<%= this.model.name %>"><input for="Value" id="property-value" value="<%= this.model.value %>"><button id="remove-property-button"><span class="glyphicon glyphicon-remove"></span></button>
+			</div>
+		</script>
+
+	<script id="property-list-template" type="template" class="template">
+		<div id="property-list" class="hidden">
+			<table class="table table-condensed table-striped textValueListTable ot-listview">
+				<thead>
+					<tr>
+						<th><%= Globalize.localize("admin.config.Name") %></th>
+						<th><%= Globalize.localize("admin.config.Value") %></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody class="textValueListTableBody">
+				</tbody>
+			</table>
+		</div>
+
+   		</script>
+
+	<script id="property-mapping-template" type="template" class="template">
+			<!-- mapping starts here -->
+									<label><%= Globalize.localize("admin.config.Entities.ExtendedECM.MapEntities") %></label>
+									<br />
+									<div class="row">
+										<div class="col-md-4">
+											<div class="input-group">
+											<select class="form-control" id="entityPropertyId" placeholder="select">
+													<option value="" disabled selected><%= Globalize.localize("admin.config.Entities.SelectEntityProperty") %></option>
+												<% _.each(this.model.get("entity").definition.info.propertySpecifications, function (propertySpecifications) { %>
+												<%	if (propertySpecifications.itemMemberName == "Properties") { %>
+												  		<%  _.each(propertySpecifications.itemMembers, function(itemMember) { %>
+																	<option value="<%- itemMember.fullyQualifiedPropertyName %>"><%- itemMember.fullyQualifiedPropertyName %></option>
+													
+															<%}); %>	
+					   								<%} }); %>	
+											</select>
+											
+											</div><!-- /input-group -->
+										</div><!-- /.col-md-5 -->
+
+										<div class="col-md-6">
+											<div class="input-group">
+											<select class="form-control" id="categoryAttribute" placeholder="select">
+													<option value="" disabled selected><%= Globalize.localize("admin.config.Entities.ExtendedECM.SelectCategoryAttribute") %></option>
+												<% _.each(this.model.getcsAttributes(), function (cSCategoryDefinition) { %>	
+													<% _.each(cSCategoryDefinition, function(category) { %>
+														 <% _.each(category.Attributes, function(attribute) { %>
+															<% if (attribute.Type == "Set") { %>
+																<% _.each(attribute.Attributes, function(setAttribute) { %>
+																<option><%- category.Name %>.<%- attribute.Name %>.<%- setAttribute.Name %></option>
+																<% }); %>	       			
+															<%} else { %>
+																	<option><%- category.Name %>.<%- attribute.Name %></option>
+															<%} %> 															
+															
+														<% }); %>
+													<% }); %>	
+					   							<% }); %>	
+											</select>
+											<span class="input-group-btn">
+												<button class="btn btn-default" type="button" id="csCategoryPicker">
+													 <span class="glyphicon glyphicon-search"></span>
+												</button>
+											</span>
+											</div><!-- /input-group -->
+										</div><!-- /.col-md-5 -->
+
+										<div class="col-md-2">
+											<div class="input-group">
+											<span class="input-group-btn">
+												<button class="btn btn-primary" type="button" id="addMapping">
+													 Add												
+												</button>
+											</span>
+											</div><!-- /input-group -->
+										</div><!-- /.col-md-2 -->
+									</div><!-- /.row -->
+
+								</div>
+								<br />
+								<!-- table starts here -->
+								<table class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th><%= Globalize.localize("admin.config.Entities.EntityProperty") %></th>
+											<th><%= Globalize.localize("admin.config.Entities.ExtendedECM.CategoryAttribute") %></th>
+										</tr>
+									</thead>
+									<tbody>
+										<% _.each(this.model.get("propertyMapping"), function (propertyMapping) { %>
+											<tr>
+												<td><%- propertyMapping.entityProperty %></td>
+												<td>
+												<div class="col-md-10">
+												<%- propertyMapping.categoryAttribute %>
+												</div>
+												<div class="col-md-1">
+													 <a href="#" id="deleteAction"  data-id="<%- propertyMapping.entityProperty %>">
+          													<span class="glyphicon glyphicon-remove-circle btn-remove-property"></span>
+       												 </a>
+												</div>
+												</td>
+												
+											</tr>
+					   					<% }); %>
+									</tbody>
+						</table>
+						<!-- table ends here ---->
+		<!-- ends here -->
+
+
+	
+	</script>
+
+	<script id="team-role-mapping-template" type="template" class="template">
+	<!-- Team roles mapping starts here -->
+	<label><%= Globalize.localize("admin.config.Entities.ExtendedECM.MapInstanceToTeamRole") %></label>
+	<br />
+	<div class="row">
+		<div class="col-md-4">
+			<div class="input-group">
+			<select class="form-control" id="instanceRoleInput" placeholder="select">
+				<option value="" disabled selected><%= Globalize.localize("admin.config.Entities.ExtendedECM.SelectInstanceRole") %></option>
+				<% _.each(this.model.get("instanceRole"), function (instanceRole) { %>
+					<option value="<%- instanceRole %>"><%- instanceRole %></option>	
+				<%}); %>
+			</select>
+			</div><!-- /input-group -->
+		</div><!-- /.col-md-5 -->
+
+		<div class="col-md-6">
+			<input type="text" class="form-control" placeholder="<%= Globalize.localize("admin.config.Entities.ExtendedECM.EnterTeamRole") %>" id="teamRoleInput" value="">
+		</div><!-- /.col-md-5 -->
+
+		<div class="col-md-2">
+			<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-primary" type="button" id="addTeamRoleMapping">
+					<%= Globalize.localize("admin.config.AddButton") %>												
+				</button>
+			</span>
+			</div><!-- /input-group -->
+		</div><!-- /.col-md-2 -->
+	</div><!-- /.row -->
+
+	<br />
+	<!-- Mapping table starts here -->
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+				<th><%= Globalize.localize("admin.config.Entities.ExtendedECM.EntityInstanceRole") %></th>
+				<th><%= Globalize.localize("admin.config.Entities.ExtendedECM.CSTeamRole") %></th>
+			</tr>
+		</thead>
+		<tbody>
+			<% _.each(this.model.get("instanceRoleMapping"), function (instanceRoleMapping) { %>
+			<tr>
+				<td><%- instanceRoleMapping.instanceRole %></td>
+				<td>
+				<div class="col-md-10">
+				<%- instanceRoleMapping.teamRole %>
+				</div>
+				<div class="col-md-1">
+					<a href="#" id="deleteInstanceRole"  data-id="<%- instanceRoleMapping.instanceRole %>">
+						<span class="glyphicon glyphicon-remove-circle btn-remove-property"></span>
+					</a>
+				</div>
+				</td>
+				
+			</tr>
+			<% }); %>
+		</tbody>
+	</table>
+	<!-- Mapping table ends here ---->
+	<!-- Team roles mapping ends here -->	
+	</script>
+
+	<script id="core-content-instance-role-mapping-template" type="template" class="template">
+			<!-- Core Content instanceRole mapping starts here -->
+			<br />
+			<div class="form-group">
+						<div id="coreContentInstanceRoleMapping">
+							<label><%= Globalize.localize("admin.config.Entities.CoreContent.MapInstanceRole") %></label>
+									<div class="row">
+													<div class="col-md-4">
+																<div class="form-group">
+																			<select class="form-control" id="instanceRoleCoreContentInput" placeholder="select">
+																						<option value="" disabled selected><%= Globalize.localize("admin.config.Entities.ExtendedECM.SelectInstanceRole") %></option>
+																						<% _.each(this.model.get("instanceRole"), function (instanceRole) { %>
+																						<option value="<%- instanceRole %>"><%- instanceRole %></option>
+																						<%}); %>
+																			</select>
+																</div>
+													</div>
+													<!-- /input-group -->
+												<div class="col-md-4">
+															<div class="form-group">
+																<select data-toggle="tooltip" data-placement="right" title="<%= Globalize.localize("admin.config.Entities.CoreContent.SelectBusinessWorkspaceRoles") %>" class="form-control" id="bwsRolesName" placeholder="select">
+																	<option value="" disabled selected>
+																		<%= Globalize.localize("admin.config.Entities.CoreContent.SelectBusinessWorkspaceRoles") %>
+																	</option>
+																	<% _.each(this.model.getCoreContentBwsRoles(), function (property) { %>
+																		<option data-toggle="tooltip" data-placement="right" value="<%- property.name %>" data-display-name="<%- property.display_name %>">
+																			<%- property.display_name %>
+																		</option>
+																	<% }); %>
+																</select>
+															</div>
+												</div>
+												<div class="col-md-4">
+															<div class="input-group">
+																		<span class="form-group">
+																		<button class="btn btn-primary" type="button" id="addCoreContentRoleMapping">
+																		<%= Globalize.localize("admin.config.Entities.CoreContent.MapButtonText") %>												
+																		</button>
+																		</span>
+															</div>
+															<!-- /input-group -->
+												</div>
+												<!-- /.col-md-2 -->
+									</div>
+									<!-- /.row -->
+						</div>
+						<!-- /col-md-12 -->
+			</div>
+			<!-- /#coreContentInstanceRoleMapping -->
+			<!-- Mapping table starts here -->
+			<table id="core-content-instance-role-mapping-table" class="table table-bordered table-hover">
+				<% if (this.model.get("instanceRoleMapping").length) { %>
+						<thead>
+									<tr >
+												<th><%= Globalize.localize("admin.config.Entities.ExtendedECM.EntityInstanceRole") %></th>
+												<th><%= Globalize.localize("admin.config.Entities.CoreContent.WorkspaceRole") %></th>
+												<th></th>
+									</tr>
+						</thead>
+						<tbody>
+									<% _.each(this.model.get("instanceRoleMapping"), function (coreContentInstanceRoleMapping) { %>
+									<tr>
+												<td class="col-md-4"><%- coreContentInstanceRoleMapping.instanceRole %></td>
+												<td class="col-md-4"><%- coreContentInstanceRoleMapping.workspaceRoleDisplayName %></td>
+												<td class="col-md-1">
+															<a href="#" id="deleteCoreContentInstanceRole"  data-id="<%- coreContentInstanceRoleMapping.instanceRole %>">
+															<span class="glyphicon glyphicon-remove-circle btn-remove-property"></span>
+															</a>
+												</td>
+									</tr>
+									<% }); %>
+						</tbody>
+						<% } %>
+			</table>
+			<!-- Mapping table ends here ---->
+			<!-- Core Content instanceRole mapping ends here -->	
+		</script>
+
+	<script id="ax-property-mapping-template" type="template" class="template">
+		<div class="form-group">
+			<label>
+				<%= Globalize.localize("admin.config.AppEnhancer.MapEntityPropsToAX") %>
+			</label>
+			<div class="row"> <!-- AX properties map input group -->
+				<div class="col-md-4"> <!-- AX entity property select -->
+					<div class="form-group">
+						<select
+							data-toggle="tooltip"
+							data-placement="right"
+							title="<%= Globalize.localize("admin.config.Entities.SelectEntityProperty") %>"
+							class="form-control"
+							id="entityPropertyId"
+							placeholder="select"
+						>
+							<option value="" disabled selected>
+								<%= Globalize.localize("admin.config.Entities.SelectEntityProperty") %>
+							</option>
+							<% _.each(this.model.get("entity").definition.info.propertySpecifications, function (propertySpecifications) { %>
+							<% 	if (propertySpecifications.itemMemberName == "Properties") { %>
+							<% 		_.each(propertySpecifications.itemMembers, function(itemMember) { %>
+								<option
+									data-toggle="tooltip"
+									data-placement="right"
+									title="<%- itemMember.propertyDescriptor.dataType %>"
+									value="<%- itemMember.fullyQualifiedPropertyName %>"
+								>
+									<%- itemMember.fullyQualifiedPropertyName %>
+								</option>
+							<% 		}); %>
+							<% 	} %>
+							<% }); %>
+						</select>
+					</div>
+				</div> <!-- /AX entity property select -->
+				<div class="col-md-4"> <!-- AX application property select -->
+					<div class="form-group">
+						<select
+							data-toggle="tooltip" data-placement="right"
+							title="<%= Globalize.localize("admin.config.AppEnhancer.SelectAXappProperty") %>"
+							class="form-control"
+							id="axProperty"
+							placeholder="select"
+						>
+							<option value="" disabled selected>
+								<%= Globalize.localize("admin.config.AppEnhancer.SelectAXappProperty") %>
+							</option>
+							<% _.each(this.model.getaxProperties(), function (property) { %>
+								<option
+									data-toggle="tooltip"
+									data-placement="right"
+									title="<%- property.Datatype %>"
+									value="<%- property.Name %>"
+								>
+									<%- property.Name %><% if(property.Required) { %> *<% } %>
+								</option>
+							<% }); %>
+						</select>
+					</div>
+				</div> <!-- /AX application property select -->
+				<div class="col-md-2"> <!-- AX properties map add button -->
+					<div class="form-group">
+						<button
+							class="btn btn-primary"
+							type="button"
+							id="addAXMapping"
+						>
+							Map
+						</button>
+					</div>
+				</div> <!-- /AX properties map add button -->
+			</div> <!-- /AX properties map input group -->
+			<label>
+				<%= Globalize.localize("admin.config.AppEnhancer.MappedProperties") %>
+			</label>
+			<table class="table table-bordered table-hover"> <!-- AX properties map table -->
+				<thead>
+					<tr>
+						<th><%= Globalize.localize("admin.config.Entities.EntityProperty") %></th>
+						<th><%= Globalize.localize("admin.config.AppEnhancer.AXApplicationProperty") %></th>
+						<th /> <!-- Empty column header for delete actions -->
+					</tr>
+				</thead>
+				<tbody>
+					<% _.each(this.model.get("propertyMapping"), function (propertyMapping) { %>
+						<tr>
+							<td class="col-md-4"> <!-- AX entity property -->
+								<%- propertyMapping.entityProperty %>
+							</td>
+							<td class="col-md-4"> <!-- AX application property -->
+								<%- propertyMapping.axRepositoryProperty %>
+							</td>
+							<td class="col-md-1"> <!-- AX property map delete button -->
+								<a href="#" id="deleteAction" data-id="<%- propertyMapping.entityProperty %>">
+									<span class="glyphicon glyphicon-remove-circle btn-remove-property"></span>
+								</a>
+							</td>
+						</tr>
+					<% }); %>
+				</tbody>
+			</table> <!-- /AX properties map table -->
+		</div>
+	</script>
+
+	<script id="core-content-mapping-template" type="template" class="template">
+		<div class="form-group">
+			<label>
+				<%= Globalize.localize("admin.config.Entities.CoreContent.EntityPropertiesToBwAttributeMap") %>
+			</label>
+			<div class="row"> <!-- Core content properties map input group -->
+				<div class="col-md-4"> <!-- Core content entity property select -->
+					<div class="form-group">
+						<select data-toggle="tooltip" data-placement="right" title="<%= Globalize.localize("admin.config.Entities.SelectEntityProperty") %>" class="form-control" id="entityPropertyName" placeholder="select">
+							<option value="" disabled selected>
+								<%= Globalize.localize("admin.config.Entities.CoreContent.SelectBusinessAttribute") %>
+							</option>
+							<% _.each(this.model.getBusinessWorkspaceUsage().propertySpecifications, function (propertySpecifications) { %>
+							<% 	if (propertySpecifications.itemMemberName == "Properties") { %>
+							<% 		_.each(propertySpecifications.itemMembers, function(itemMember) { %>
+								<option data-toggle="tooltip" data-placement="right" title="<%- itemMember.propertyDescriptor.dataType %>" value="<%- itemMember.fullyQualifiedPropertyName %>">
+									<%- itemMember.fullyQualifiedPropertyName %>
+								</option>
+							<% 		}); %>
+							<% 	} %>
+							<% }); %>
+						</select>
+					</div>
+				</div> <!-- Core content entity property select -->
+				<div class="col-md-4"> <!-- Core content application property select -->
+					<div class="form-group">
+						<select data-toggle="tooltip" data-placement="right" title="<%= Globalize.localize("admin.config.Entities.CoreContent.SelectBusinessWorkspaceAttribute") %>" class="form-control" id="bwsAttributeName" placeholder="select">
+							<option value="" disabled selected>
+								<%= Globalize.localize("admin.config.Entities.CoreContent.SelectBusinessWorkspaceAttribute") %>
+							</option>
+							<% _.each(this.model.getCoreContentBwsAttribute(), function (property) { %>
+								<option data-toggle="tooltip" data-placement="right" title="<%- property.data_type %>" value="<%- property.name %>" data-display-name="<%- property.display_name %>">
+									<%- property.display_name %>
+								</option>
+							<% }); %>
+						</select>
+					</div>
+				</div> <!-- Core content application property select -->
+				<div class="col-md-2"> <!-- Core content properties map add button -->
+					<div class="form-group">
+						<button class="btn btn-primary" type="button" id="addCoreContentMapping">Map</button>
+					</div>
+				</div> <!-- Core content properties map add button -->
+			</div> <!-- Core content properties map input group -->
+			<table class="table table-bordered table-hover"> <!-- Core content properties map table -->
+				<% if (this.model.getCoreContentMappings().length) { %>
+				<thead>
+					<tr>
+						<th><%= Globalize.localize("admin.config.Entities.EntityProperty") %></th>
+						<th><%= Globalize.localize("admin.config.Entities.CoreContent.BusinessWorkspaceAttribute") %></th>
+						<th /> <!-- Empty column header for delete actions -->
+					</tr>
+				</thead>
+				<tbody>
+					<% _.each(this.model.getCoreContentMappings(), function (property) { %>
+						<tr>
+							<td class="col-md-4"> <!-- entity property -->
+								<%- property.entityProperty %>
+							</td>
+							<td class="col-md-4"> <!-- BWS attribute -->
+								<%- property.bwsAttribute.displayName %>
+							</td>
+							<td class="col-md-1"> <!-- Map delete button -->
+								<a href="#" id="coreContentDelete" data-id="<%- property.entityProperty %>">
+									<span class="glyphicon glyphicon-remove-circle btn-remove-property"></span>
+								</a>
+							</td>
+						</tr>
+					<% }); %>
+				</tbody>
+				<% } %>
+			</table> <!-- /Core content properties map table -->
+			</div>
+	</script>
+
+	<script class="template" type="text/template" id="ae-viewer-parameter-table">
+		<thead>
+			<tr>
+				<th>
+					<div class="form-check text-center">
+						<input class="form-check-input" type="checkbox" data-id="checkbox" />
+					</div>
+				</th>
+				<th>
+					<div><%= Globalize.localize("admin.config.Name") %></div>
+				</th>
+				<th>
+					<div><%= Globalize.localize("admin.config.Type") %></div>
+				</th>
+				<th>
+					<div><%= Globalize.localize("admin.config.Value") %></div>
+				</th>
+			</tr>
+		</thead>
+		<tbody />
+	</script>
+
+	<script class="template" type="text/template" id="ae-viewer-parameter-table-body-record">
+		<td>
+			<div class="form-check text-center">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					data-id="<%= name %>"
+				/>
+			</div>
+		</td>
+		<td>
+			<div><%= name %></div>
+		</td>
+		<td>
+			<div><%= type %></div>
+		</td>
+		<td>
+			<div><%= value %></div>
+		</td>
+	</script>
+
+	<script class="template" type="text/template" id="ae-viewer-parameter-dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<div class="row">
+						<div class="form-group col-md-12">
+							<% if (action === "Add") { %>
+								<h3><%= Globalize.localize("admin.config.AppEnhancer.AddViewerParameter") %></h3>
+							<% } else if (action === "Edit") { %>
+								<h3><%= Globalize.localize("admin.config.AppEnhancer.EditViewerParameter") %></h3>
+							<% } else if (action === "Delete") { %>
+								<h3><%= Globalize.localize("admin.config.AppEnhancer.DeleteViewerParameter") %></h3>
+							<% } %>
+						</div>
+					</div>
+					<div class="row feedback hidden">
+						<div class="form-group col-md-12">
+							<img
+								src="/home/exampletenant/app/admin/web/images/status_errors.svg"
+								width="20"
+							/>
+							<label />
+						</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<% if (action === "Add" || action === "Edit") { %>
+						<div class="row">
+							<div class="col-md-12">
+								<label class="control-label">
+									<%= Globalize.localize("admin.config.Type") %>
+								</label>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<input
+										type="radio"
+										name="ae-viewer-param-type"
+										id="ae-viewer-param-type-custom"
+										value="custom"
+										<% if (type === "custom") { %>
+											checked
+										<% } %>
+									>
+									<label for="ae-viewer-param-type-custom">
+										<%= Globalize.localize("admin.config.AppEnhancer.CustomProperty") %>
+									</label>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<input
+										type="radio"
+										name="ae-viewer-param-type"
+										id="ae-viewer-param-type-entity"
+										value="entity"
+										<% if (type === "entity") { %>
+											checked
+										<% } %>
+									>
+									<label for="ae-viewer-param-type-entity">
+										<%= Globalize.localize("admin.config.Entities.EntityProperty") %>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div
+							id="ae-viewer-param-custom"
+							class="row <%= type !== 'custom' ? 'hidden' : '' %>"
+						>
+							<div class="form-group col-md-6">
+								<label for="ae-viewer-param-name-custom">
+									<%= Globalize.localize("admin.config.Name") %>
+								</label>
+								<input
+									type="text"
+									class="form-control"
+									id="ae-viewer-param-name-custom"
+									value="<%= type === 'custom' ? name : '' %>"
+									required
+								/>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="ae-viewer-param-value-custom">
+									<%= Globalize.localize("admin.config.Value") %>
+								</label>
+								<input
+									type="text"
+									class="form-control"
+									id="ae-viewer-param-value-custom"
+									value="<%= value %>"
+									required
+								/>
+							</div>
+						</div>
+						<div
+							id="ae-viewer-param-entity"
+							class="row <%= type !== 'entity' ? 'hidden' : '' %>"
+						>
+							<div class="form-group col-md-12">
+								<label for="ae-viewer-param-name-entity">
+									<%= Globalize.localize("admin.config.Name") %>
+								</label>
+								<select
+									title="<%= Globalize.localize('admin.config.Entities.SelectEntityProperty') %>"
+									class="form-control"
+									id="ae-viewer-param-name-entity"
+								>
+									<option
+										value=""
+										disabled
+										<% if (type === "entity" && name === "" || type !== "entity") { %>
+											selected
+										<% } %>
+									>
+										<%= Globalize.localize("admin.config.Entities.SelectEntityProperty") %>
+									</option>
+									<% _.each(entityProperties, function (entityProperty) { %>
+										<option
+											value="<%= entityProperty %>"
+											<% if (entityProperty === name) { %>
+												selected
+											<% } %>
+										>
+											<%= entityProperty %>
+										</option>
+									<% }); %>
+								</select>
+							</div>
+						</div>
+					<% } else if (action === "Delete") { %>
+						<p><%= Globalize.localize("admin.config.AppEnhancer.DeleteViewerParameterConfirmMessage") %></p>
+					<% } %>
+				</div>
+				<div class="modal-footer">
+					<button
+						class="btn btn-primary"
+						data-dismiss="modal"
+					>
+						<% if (action === "Add") { %>
+							<span><%= Globalize.localize("admin.config.AddButton") %></span>
+						<% } else if (action === "Edit") { %>
+							<span><%= Globalize.localize("admin.config.SaveButton") %></span>
+						<% } else { %>
+							<span><%= Globalize.localize("admin.config.OkButton") %></span>
+						<% } %>
+					</button>
+					<button class="btn btn-cancel" data-dismiss="modal">
+						<span><%= Globalize.localize("admin.config.CancelButton") %></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</script>
+
+	<script id="create-property-dialog-template" type="text/html"
+		class="template">
+		<div id = "property-dialog" class="modal fade" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header iHub-modal-header"">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h3 style="margin-top: 5px;"><%= Globalize.localize("admin.config.CreateProperty") %></h3>
+					</div>
+					<div class="modal-body">
+						<form id="configure-property-form" role="form" class="config-form">
+                        	<div class="form-group has-feedback">
+								<label><%= Globalize.localize("admin.config.Name") %></label>
+								<input type="text" class="form-control" id="name" value="">
+							</div>
+   							<div class="form-group">
+      							<label><%= Globalize.localize("admin.config.Value") %></label>
+      							<input type="text" class="form-control" id="value" value="">
+   							</div>
+						</form>
+					</div>
+					<div class="modal-footer iHub-modal-footer">
+						<button class="btn btn-primary" id="ok-button" data-dismiss="modal" disabled><span><%= Globalize.localize("admin.config.AddButton") %></span></button>
+						<button class="btn btn-cancel" data-dismiss="modal"><span><%= Globalize.localize("admin.config.CancelButton") %></span></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		</script>
+
+		<script id="manage-conditions-dialog-template" type="text/html" class="template">
+			<div id = "manage-condition-dialog" class="modal fade" tabindex="-1">
+				<div class="modal-dialog">
+					<div class="modal-content" style="width: 700px;height: calc(100vh - 150px);">
+						<div class="modal-header iHub-modal-header"">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h3 style="margin-top: 5px;"><%= Globalize.localize("admin.config.Entities.ManageConditions") %></h3>
+						</div>
+						<div class="modal-body" style="height: calc(100vh - 250px);">
+							<div id="manage-condition-dialog-select">
+								<label><%= Globalize.localize("admin.config.Entities.PropertyCondition") %></label>
+								<select class="form-control" id="entityDialogPropertiesSelect" placeholder="select">
+									<option value="NothingSelected"><%- Globalize.localize("admin.config.Entities.MetadataConfigurations.selectDoctypeProperty") %></option>
+									<% _.each(documentTypesProperties.Property, function(element){ %>
+										<option title='<%= element.Name %>' value='<%= element.DisplayName %>'><%= element.DisplayName %></option>
+									<% });%>	
+								</select>
+							</div>
+							<div>
+								<label style="padding: 10px;"><%= Globalize.localize("admin.config.Entities.PropertyConditionLabel") %></label>
+							</div>
+							<div class="row manage-condition-div">
+								<div class="actions-container col-md-12">
+									<button id="add-conditionBtn" disabled class="btn add-row-button" title="Add"></button>
+									<div class="separator btn-ish separatorStyles"></div>
+								</div>
+							</div>
+							<div id="metadata-table-container">
+								<!-- table starts here -->
+								<% _.each(this.model.get("documentTypesPropertiesConditions"), function (element) { %>
+									<div>
+										<div id='<%= JSON.stringify(element) %>' class="row condition-container">
+											<div class="col-md-2">
+												<input type="checkbox" class="condition-checkbox">
+											</div>
+											<div class="col-md-7">
+												<span>if <%= element.PropertyName %> = <%= element.PropertyValue %></span>
+											</div>
+											<div class="col-md-3">
+												<button id="edit-conditionBtn" class="btn edit-row-button" title="Edit"></button>
+												<button id="delete-conditionBtn" class="btn delete-row-button" title="Delete"></button>
+											</div>
+										</div>
+									</div>
+								<% }); %>
+							</div>
+						</div>
+						<div class="modal-footer iHub-modal-footer">
+							<button id="metadata-save" class="btn btn-primary" disabled data-dismiss="modal"><span><%= Globalize.localize("admin.config.SaveButton") %></span></button>
+							<button class="btn btn-cancel" data-dismiss="modal"><span><%= Globalize.localize("admin.config.CancelButton") %></span></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script id="manage-conditions-dialog-table-template" type="template" class="template">
+				<% _.each(conditions, function(element){ %>
+					<div id='<%= JSON.stringify(element) %>' class="row condition-container">
+						<div class="col-md-2">
+							<input type="checkbox" class="condition-checkbox">
+						</div>
+						<div class="col-md-7">
+							<span>if <%= element.PropertyName %> = <%= element.PropertyValue %></span>
+						</div>
+						<div class="col-md-3">
+							<button id="edit-conditionBtn" class="btn edit-row-button" title="Edit"></button>
+							<button id="delete-conditionBtn" class="btn delete-row-button" title="Delete"></button>
+						</div>
+					</div>
+				<% });%>
+		</script>
+
+		<script id="manage-conditions-dialog-new-row-template" type="template" class="template">
+				<% _.each(selctedProperty, function(element){ %>
+					<div class="add-new-row-container" class="row">
+						<div class="col-md-4" >
+							<span style="float: right;">if <%= element %> =</span>
+						</div>
+						<div class="col-md-5">
+							<input id="condition-input" type="text">
+						</div>
+						<div class="col-md-3">
+							<button class="btn btn-save" disabled id="metadata-new-condition-save" title="Save"></button>
+							<button class="btn" id="metadata-cancel" title="Cancel"></button>
+						</div>
+					</div>
+				<% });%>
+		</script>
+
+		<script id="select-rendition-dialog-template" type="text/html" class="template">
+			<div id = "select-rendition-dialog" class="modal fade" tabindex="-1">
+				<div class="modal-dialog">
+					<div class="modal-content" style="width: 700px;height: calc(100vh - 250px);">
+						<div class="modal-header iHub-modal-header">
+							<h3 style="margin-top: 5px;display: inline;"><%= Globalize.localize("admin.config.Entities.SelectRenditions") %></h3>
+							<div class="pull-right" style="width: 40%;">
+									<input id="filter-rendition" type="text" placeholder="Search renditions" style="width: 100%;">
+									<span id="rendition-search-clear" class="glyphicon glyphicon-remove-circle" style='display: none;'></span>
+							</div>
+						</div>
+						<div class="modal-body" style="height: calc(100vh - 350px);">
+							<div id="select-renditions-table-container">
+								<!-- table starts here -->
+							</div>
+						</div>
+						<div class="modal-footer iHub-modal-footer">
+							<button id="renditions-dialog-select" class="btn btn-primary" disabled><span><%= Globalize.localize("admin.config.SelectButton") %></span></button>
+							<button class="btn" id="rendition-select-cancel" title="Cancel"><%= Globalize.localize("admin.config.CancelButton") %></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script id="manage-doctypes-dialog-template" type="text/html" class="template">
+			<div id = "manage-doctype-dialog" class="modal fade iHub-modal" tabindex="-1">
+				<div class="modal-dialog iHub-modal-dialog">
+					<div class="modal-content iHub-modal-content">
+						<div class="modal-header iHub-modal-header">
+							<h3 class="manage-docType-heading"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.ManageConfiguration") %></h3>
+						</div>
+						<div class="modal-body manage-docType-modal-height">
+							<div id="select-defaultDocType-table-container" class="container manage-docType-container">
+								<!-- manage config starts here -->
+							</div>							
+						</div>						
+						<div class="modal-footer iHub-modal-footer">
+							<button id="defaultDoc-save" class="btn btn-primary" disabled data-dismiss="modal"><span><%= Globalize.localize("admin.config.SaveButton") %></span></button>
+							<button class="btn btn-cancel" data-dismiss="modal"><span><%= Globalize.localize("admin.config.CancelButton") %></span></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+	<script class="template" type="text/template" id="modal-message">
+		<div class="modal-message-container" style="border-bottom: <%= borderBottom %>">
+			<div class="modal-message-header">
+				<img
+					src="/home/exampletenant/app/admin/web/images/<%= icon %>"
+					width=24 height=24
+				/>
+				<p><%= title %></p>
+			</div>
+			<div class="modal-message-content-area">
+				<p><%= message %></p>
+			</div>
+			<div class="modal-message-footer">
+				<% _.each(buttons, function (button) { %>
+					<button class="btn <%= button.state %>" data-dismiss="modal">
+						<%= button.text %>
+					</button>
+				<% });%>
+			</div>
+		</div>
+	</script>
+
+	<script class="template" type="text/template" id="modal-window-standard">
+		<div class="modal-standard-window">
+			<div class="modal-standard-window-header"><%= title %></div>
+			<div class="modal-standard-window-content-area"></div>
+			<div class="modal-standard-window-footer"></div>
+		</div>
+	</script>
+
+	<script id="default-DocType-Confirmation-Dialog-template" type="template"	class="template">
+
+		<div id="removeDocTypeDailog" class="modal fade">
+			<div class="modal-dialog manage-docType-confirmation-modal">
+				<div class="modal-content">
+					<div class="modal-header" style="border: none;">						
+						<div style="display: -webkit-box;">
+							<img  src="/home/exampletenant/app/admin/web/images/status_warnings.svg" width=24 height=24 style="margin-top:20px"/>
+							<h3 data-bind="text: Globalize.localize("admin.config.CreateProperty")" style="margin-left:8px"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.RemoveLabel") %></h3>
+						</div>
+					</div>
+					<div class="modal-body">
+						<p id="warningMsg"></p>
+					</div>
+						<div class="modal-footer" id="userConfirmationActions">
+							<button type="button" data-dismiss="modal" class="btn btn-primary" id="saveLatestChanges" ><%= Globalize.localize("admin.config.Entities.ManageDocTypes.RemoveLabel") %></button>
+							<button  id="deleteCancel" class="cancelLatestChanges btn btn-cancel">Cancel</button>
+						</div>
+				</div>
+			</div>
+		</div>
+	</script>
+
+		<script id="renditions-dialog-table-template" type="template" class="template">
+			<% _.each(this.model.get('filterRenditionsTypes'), function (element) { %>
+				<div style='height: 40px;'>
+					<div id='<%= element.Name %>' data-rendition='<%= JSON.stringify(element) %>' class="row rendition-container">
+						<div style="text-overflow: ellipsis;">
+							<span><%= element.DisplayName %> - (<%= element.Name %>)</span>
+						</div>
+					</div>
+				</div>
+				<% });%>
+		</script>
+
+		<script id="defaultDocType-dialog-table-template" type="template" class="template">
+
+			<div class="form-group">
+				<div class="controls">
+					<label><%= Globalize.localize("admin.config.Entities.ManageDocTypes.DefaultDocTypeLabel") %></label>
+					<select class="form-control" id="selectDefaultDocumentType" placeholder="select" style="height:40px">
+						<option value="NothingSelected"><%- Globalize.localize("admin.config.Entities.MetadataConfigurations.selectDoctype") %></option>
+						<% _.each(selectedDocuments, function(element){%>
+							<option value='<%= element.Type %>'><%= element.Type %></option>
+						<% });%>	
+					</select>
+				</div>
+			</div>
+
+			<div id="delete-confirmation-dialog" class="container">
+				<!-- delete confirm starts here -->
+			</div>
+
+
+			<% _.each(selectedDocuments, function (element) { %> 
+				<div class="accordion-group" >
+					<div class="row manage-condition-div controls" style="height:42px">
+						<ul class="accordion-toggle glyphicon glyphicon-chevron-right manage-docType-glyphicon"  id="expand1" data-toggle="collapse" data-target="#TargetDocChildren<%= element.Type %><%= ++tempVal %>" >	
+						</ul>
+						<span class="controls manage-docType-grid-span"> <%=element.Type%> </span>
+						<span class="text-muted" id="<%=element.Type%>" hidden><%= Globalize.localize("admin.config.Entities.ManageDocTypes.DefaultMutedLabel") %></span>
+						<button id="deleteDocConfig" class="btn pull-right remove-row-button" style=" margin-top: 5px;"></button>
+					</div>
+					<hr id="horizontalLine" class="manage-docType-grid-hr"></hr>
+					<div id="TargetDocChildren<%= element.Type %><%= tempVal %>" class="form-group panel-collapse collapse manage-targetDocChild-span">
+						<div class="accordion-group" >							
+							<div class="form-group">
+								<label class="manage-docType-sub-heading"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.RenditionLabel") %></label>								
+								<div class="form-group manage-docType-span-display">
+									<% if(element.Rendition) { %>
+										<span><%= element.Rendition.Name %> <%= element.Rendition.DisplayName %></span>												
+									<% } %>								
+								</div>								
+							</div>
+							
+							<div class="form-group">
+															
+								<div class="form-group" >									
+									<% _.each(element.Filter, function (filter) { %>										
+										<% if(filter.Condition) { %>
+										 <div class="form-group">
+											<div class="form-group">
+											<label class="manage-docType-sub-heading"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.ConditionLabel") %></label>												
+											
+											<span class="manage-docType-span-display"><%= filter.Condition.PropertyName %> = <%= filter.Condition.PropertyValue %> </span>											
+											</div>
+											<div class="form-group manage-docType-padding-left">	
+												<div class="form-group">
+													<label class="manage-docType-label-diplay"> <%= Globalize.localize("admin.config.Entities.ManageDocTypes.Properties") %></label>
+													<div class="form-group manage-docType-span-display">
+														
+															<% _.each(filter.PropertyList, function (prop) { %>
+																<span class="manage-docType-margin-bottom">  <%=this.model.getPropertyDisplayName(prop)%></span>
+															<% });%>
+														
+													</div>
+												</div>
+
+												<div class="form-group">
+													<label class="manage-docType-label-diplay"> <%= Globalize.localize("admin.config.Entities.ManageDocTypes.ReadonlyProperties") %> </label>
+													<div class="form-group manage-docType-span-display">
+														
+															<% _.each(filter.ReadOnlyPropertyList, function (prop) { %>
+																<span class="manage-docType-margin-bottom" >  <%= this.model.getPropertyDisplayName(prop) %></span>
+															<% });%>
+														
+													</div>
+												</div>
+
+												<div class="form-group">
+													<label class="manage-docType-label-diplay"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.RequiredProperties") %></label>
+													<div class="form-group manage-docType-span-display">
+														
+															<% _.each(filter.RequiredPropertyList, function (prop) { %>
+																<span class="manage-docType-margin-bottom" >  <%= this.model.getPropertyDisplayName(prop) %></span>
+															<% });%>
+														
+													</div>
+												</div>
+											</div>	
+										</div> 
+										<% }%>	
+										<% if(typeof(filter.Condition) === "undefined"){ %>
+										    <div class="form-group"><label class="manage-docType-sub-heading"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.DefaultLabel") %></label></div>
+											<div class="form-group manage-docType-padding-left">
+											<div class="form-group">
+												<label class="manage-docType-label-diplay"> <%= Globalize.localize("admin.config.Entities.ManageDocTypes.Properties") %></label>
+												<div class="form-group manage-docType-span-display">
+													
+														<% _.each(filter.PropertyList, function (prop) { %>
+															<span class="manage-docType-margin-bottom">  <%= this.model.getPropertyDisplayName(prop) %></span>
+														<% });%>
+													
+												</div>
+											</div>
+
+											<div class="form-group">
+												<label class="manage-docType-label-diplay"> <%= Globalize.localize("admin.config.Entities.ManageDocTypes.ReadonlyProperties") %> </label>
+												<div class="form-group manage-docType-span-display">
+													
+														<% _.each(filter.ReadOnlyPropertyList, function (prop) { %>
+															<span class="manage-docType-margin-bottom" >  <%= this.model.getPropertyDisplayName(prop) %></span>
+														<% });%>
+													
+												</div>
+											</div>
+
+											<div class="form-group">
+												<label class="manage-docType-label-diplay"><%= Globalize.localize("admin.config.Entities.ManageDocTypes.RequiredProperties") %></label>
+												<div class="form-group manage-docType-span-display">
+													
+														<% _.each(filter.RequiredPropertyList, function (prop) { %>
+															<span class="manage-docType-margin-bottom" >  <%= this.model.getPropertyDisplayName(prop) %></span>
+														<% });%>
+													
+												</div>
+											</div>
+										</div>
+
+										<% }%>	
+											
+									<% });%>
+								</div>								
+							</div>
+									
+							
+						</div>	
+					</div>
+				</div>	
+			<% });%>				
+		</script>
+		
+		<script id="select-rendition-dialog-template" type="text/html" class="template">
+			<div id = "select-rendition-dialog" class="modal fade" tabindex="-1">
+				<div class="modal-dialog">
+					<div class="modal-content" style="width: 700px;height: calc(100vh - 250px);">
+						<div class="modal-header iHub-modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h3 style="margin-top: 5px;display: inline;"><%= Globalize.localize("admin.config.Entities.SelectRenditions") %></h3>
+							<input id="filter-rendition" type="text" class="pull-right" placeholder="Search renditions" style="width: 40%;margin: 0px 20px;">
+						</div>
+						<div class="modal-body" style="height: calc(100vh - 350px);">
+							<div id="select-renditions-table-container">
+								<!-- table starts here -->
+							</div>
+						</div>
+						<div class="modal-footer iHub-modal-footer">
+							<button id="renditions-dialog-select" class="btn btn-primary" disabled><span><%= Globalize.localize("admin.config.SelectButton") %></span></button>
+							<button class="btn" id="rendition-select-cancel" title="Cancel"><%= Globalize.localize("admin.config.CancelButton") %></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script id="renditions-dialog-table-template" type="template" class="template">
+			<% _.each(this.model.get('filterRenditionsTypes'), function (element) { %>
+				<div style='height: 40px;'>
+					<div id='<%= JSON.stringify(element) %>' class="row rendition-container">
+						<div style="text-overflow: ellipsis;">
+							<span><%= element.DisplayName %> - <%= element.Name %></span>
+						</div>
+					</div>
+				</div>
+			<% }); %>
+		</script>
+
+		<script id="create-iHub-dialog-template" type="template" class="template">
+			<div id="iHubModal" class="modal fade iHub-modal" tabindex="-1" >
+				<div class="modal-dialog iHub-modal-dialog">
+					<div class="modal-content iHub-modal-content">
+						<div class="modal-header iHub-modal-header">
+							<button type="button"  data-dismiss="modal" aria-hidden="true" title="Close" class="iHub-circular-warning-close"></button>
+							<h3  style="margin-top: 5px;"><%= Globalize.localize("admin.config.iHub.ExportiHubDataObject") %></h3>
+						</div>
+						<div class="modal-body iHub-modal-body">
+							<div id="loadiHubFactTableView" class="fact-table-body ">
+								<div>
+									<h3 class="fact-table-header"><%= Globalize.localize("admin.config.iHub.SelectFactTable") %></h3>
+								</div>
+							</div>
+						<div id="loadiHubDimensionTableView" class="dimension-table-body " ></div>
+						</div>
+							<div class="modal-footer iHub-modal-footer">
+								<button class="btn btn-cancel  iHub-back" style="display:none" id="iHub-Back">
+										<span><%=Globalize.localize("admin.config.iHub.Back") %></span>
+								</button>
+									<div class="btn-group">
+										<button class="btn btn-primary" id="iHub-Export" data-dismiss="modal" disabled>
+											<span><%= Globalize.localize("admin.config.iHub.Export") %></span>
+										</button>
+										<button id= "iHub-ExportAll-caret" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+											<span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu pull-left iHub-export-all">
+											<button class="btn btn-primary" id="iHub-Export-All" data-dismiss="modal">
+												<span><%= Globalize.localize("admin.config.iHub.ExportAll") %></span>
+											</button>
+										</ul>
+									</div>
+								<button class="btn btn-ok iHub-add-dimension"  id="iHub-Add-Dimension" disabled>
+									<span><%= Globalize.localize("admin.config.iHub.AddDimension") %></span>
+								</button>
+								<button class="btn btn-cancel" data-dismiss="modal" id="iHub-Cancel">
+									<span><%= Globalize.localize("admin.config.iHub.Cancel") %></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+		</script>
+	<script id="create-iHub-selected-entity-template" type="template" class="template">
+		<div id="selectedDimensionView"  class="col-sm-2 iHub-selected-dimension-template">									
+			<label class="iHub-fact-table-label">
+				<%= Globalize.localize("admin.config.iHub.FactTableLabel") %>
+			</label> <br>
+			<span>
+				<%- entityName %>
+			</span><br>
+			<label class="iHub-selected-dimension-label">
+				<%= Globalize.localize("admin.config.iHub.AddedDimensions") %>
+			</label>
+			<ol id="dimensionTable"></ol>
+		</div>
+	</script>
+	<script id="create-iHub-selected-dimension-template" type="template" class="template">
+		
+			<%- entityName %>
+		
+	</script>
+	<script id="create-iHub-fact-table-entity-template" type="template" class="template">
+		<div class="accordion-group" >
+			<ul class="accordion-toggle glyphicon glyphicon-chevron-right iHub-accordion" id="expand<%- data.id %>" data-toggle="collapse" data-target="#TargetChildren<%- data.id %>" >	
+			</ul>
+			<label class="iHub-entity-name-label">
+				<input type="radio" name="entities" id="entityName" value="<%- data.id %>"> 
+				<label ></label>
+				<span class="iHub-entity-name"> <%- entityName %></span>
+			</label>
+			<ul id="TargetChildren<%- data.id %>" class="panel-collapse collapse iHub-target-fact"></ul>
+		</div>
+	</script>
+	<script id="create-iHub-fact-table-dialog-template" type="template" class="template">
+		 <div class="iHub-Solution-name">   
+			<span class="iHub-solution-name"id="solution<%- data.id %>"><%- solutionName %></span> 
+		 </div>
+		 <div id="EntityView" class="iHub-dimension-entity-view" ></div>		
+	</script>
+	<script id="create-iHub-dimension-table-dialog-template" type="template" class="template">
+		<div  id="iHubDimensionView" class="iHub-dimension col-sm-9">
+			<h3 class="fact-table-header"><%= Globalize.localize("admin.config.iHub.SelecteZeroOrMoreDimensions") %></h3>
+			<div id="dimensionEntityView" class="iHub-dimension-tree"></div>
+		</div>
+	</script>
+	<script id="create-iHub-dimension-error-dialog-template" type="template" class="template">
+			<div id="dimensionErrorMsg">
+				<span><%- errorMessage %></span>
+			</div>
+	</script>
+	<script id="create-iHub-dimension-table-entity-template" type="template" class="template">
+			<div class="entityCollapseOneTemplate accordion-group">
+					<ul class="accordion-toggle glyphicon glyphicon-chevron-right iHub-accordion" id="<%=parentIds%>-<%=data.id%>" data-toggle="collapse" data-target=			         "#entityCollapseOne<%=parentIds%>-<%=data.id%>" ></ul>						
+					<label class="iHub-entity-name-label">								
+						<input type="checkbox"  name="relatedEntities" value="<%-data.id%>" id="relatedEntityCheck">
+						<label></label>
+						<span class="iHub-entity-name"><%- entityName %></span>
+					</label>
+					<span class="iHub-solution-name"><%- entitySolutionName %></span>
+					
+					<ul id="entityCollapseOne<%=parentIds%>-<%=data.id%>" class="panel-collapse collapse iHub-target-dimensions"></ul>
+			</div>
+	</script>
+	
+	<script id="create-iHub-circular-warning-template" type="text/html">   
+		<div id="iHubCircularWarningAlert" class= "iHub-circular-warning-alert" >
+			 <div class="alert alert-warning iHub-warning-alert">
+				<div class="notificationIcon warningIcon iHub-circular-warning-icon" >
+					<span class="iHub-circular-warning-message"><%= Globalize.localize("admin.config.iHub.CircularWarningMessage") %>
+						<button type="button"  id="warningClose" aria-hidden="true"  title="Close" class="iHub-circular-warning-close"></button>
+					</span>
+				</div>
+			</div>
+		</div>
+		
+	</script>
+	<script id="security-policy-template" type="template" class="template">
+			<div id="security-vector" class="security-vector">
+            	<% var vector = this.model.get("securityVector"),  model = this.model;                                                         
+           		_.each(vector.grants, function(grant) { %>
+            		<div>
+						<input
+							name="permission"
+							role-name="<%= grant.roleName %>" 
+							permission-name="<%= vector.permissionName %>" 
+							permission-type="<%= grant.permissionType %>" 
+							type="checkbox" 
+                            <% if (!model.isRoleEnabled(grant.roleName, vector.permissionName)) { %> disabled <% } %>
+							<% if (grant.state) { %>checked<% } %> />&nbsp;&nbsp;<%= grant.roleDisplayName %>                                                        
+              		</div>
+				<% }) %>
+			</div>		
+		</script>
+
+	<script id="solution-availability" type="template" class="template">
+			<div class="form-group">
+				<label for="version-availability"><%- Globalize.localize("admin.config.SolutionAvailabilityHeading") %></label>
+				<div class="controls">
+					<select class="form-control" name="version-availability">
+						<option value="<%- ot_App.solutionManager.versionAvailabilityOption.Available%>" <%- this.availableSelected() %>><%- Globalize.localize("admin.config.SolutionAvailableSelection") %></option>
+						<option value="<%- ot_App.solutionManager.versionAvailabilityOption.AvailableReadOnly%>" <%- this.availableReadOnlySelected() %>><%- Globalize.localize("admin.config.SolutionAvailableReadOnlySelection") %></option>                                        
+						<option value="<%- ot_App.solutionManager.versionAvailabilityOption.Unavailable%>" <%- this.unAvailableSelected() %>><%- Globalize.localize("admin.config.SolutionUnvailableSelection") %></option>
+						<option value="<%- ot_App.solutionManager.versionAvailabilityOption.Disabled%>" <%- this.disabledSelected() %>><%- Globalize.localize("admin.config.SolutionDisabledSelection") %></option>
+					</select>
+				</div>
+			</div>
+		</script>
+		
+	<script id="solution-errors" type="template" class="template">
+			<div class="list-group">
+				<div class="list-group-item accordion-group" id='solutionErrors'>
+					<div class="accordion-heading">
+				   		<h6 class="panel-title">
+							<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#solutionErrors' href='#solutionErrorsCollapseOne'>
+								<span class="accordian-toggle-text">
+									<%= Globalize.localize("admin.config.SolutionErrors") %>&nbsp;(<%= this.getErrorCount() %>)
+								</span>
+							</a>
+				   		</h6>
+					</div> 
+					<div id='solutionErrorsCollapseOne' class="panel-collapse collapse">
+						<div class="accordion-inner">
+							<% _.each(this.getErrorMessages(), function (message) { %>
+								<div class="list-group-item"><%- message %></div>
+							<% }); %>
+						</div>
+					</div>	
+				</div>
+
+				<div class="list-group-item accordion-group" id='solutionWarnings'>
+					<div class="accordion-heading">
+				   		<h6 class="panel-title">
+							<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#solutionWarnings' href='#solutionWarningsCollapseOne'>
+								<span class="accordian-toggle-text">
+									<%= Globalize.localize("admin.config.SolutionWarnings") %>&nbsp;(<%= this.getWarningCount() %>)
+								</span>
+							</a>
+				   		</h6>
+					</div> 
+					<div id='solutionWarningsCollapseOne' class="panel-collapse collapse">
+						<div class="accordion-inner">
+							<% _.each(this.getWarningMessages(), function (message) { %>
+								<div class="list-group-item"><%- message %></div>
+							<% }); %>
+						</div>
+					</div>	
+				</div>
+			</div>
+		</script>
+
+		<script id="bwsConfiguration-report" type="template" class="template">
+			<!-- doc store configuration report -->
+				<div class="list-group-item accordion-group" id='docstoreReport' style='clear:both'>
+					<div class="accordion-heading" style='clear:both'>
+				   		<h6 class="panel-title">
+							<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#docstoreReport' href='#docstoreconfiguration'>
+								<span class="accordian-toggle-text">
+									<%= Globalize.localize("admin.config.ExtendedECM.DocumentstoreConfigurationReport") %>
+								</span>
+							</a>
+				   		</h6>
+					</div>
+					<div id='docstoreconfiguration' class="panel-collapse collapse" style='clear:both'>
+						<div class="accordion-inner container" style="width: inherit;">
+							<div class='table-responsive'>
+							
+								<% if(this.model.canShowExternalizedElements){%>
+								<% if(!(this.model.docstoreConfig.ServiceContainerConfigurations.length == 1 && this.model.docstoreConfig.ServiceContainerConfigurations[0].ServiceContainerName == "Repository")){ %>
+									<br/>
+										<div class="tab-content">
+											<% _.each(this.model.docstoreConfig.ServiceContainerConfigurations, function (serviceContainer) { %>
+												<div id="<%- serviceContainer.Id %>" class="tab-pane fade in active table-responsive">
+													<p><%- serviceContainer.ComputerName %> : <%- serviceContainer.ServiceContainerName %></p>
+													<table class="table">
+														<thead class="thead-dark">
+															<tr>
+																<th><%= Globalize.localize("admin.config.ExtendedECM.Attribute") %></th>
+																<th><%= Globalize.localize("admin.config.Value") %></th>
+																<th><%= Globalize.localize("admin.config.ExtendedECM.Status") %></th>
+															</tr>
+														</thead>
+														<tbody>
+														<%
+															let configurationDetails = _.filter(serviceContainer.Configuration, configurationElement => configurationElement.hasOwnProperty('Valid'));
+
+															if (serviceContainer.Configuration.ViewerConfiguration) {
+																configurationDetails = {
+																	...configurationDetails,
+																	...serviceContainer.Configuration.ViewerConfiguration
+																};
+															}
+
+															_.each(configurationDetails, function (property) {
+														%>
+															<tr>
+																<td class='bws-table-column' style='max-width: 10px;'>
+																	<%- property.Name %></th>
+																<td class='bws-table-column' title='<%- property.Value %>'><%- property.Value %></td>
+																<td class='bws-table-column'>
+																	<% if (property.Valid) { %>
+																		<span class="xecm_icon xecm_status_completed_icon"></span>        			
+																	<% } else { %>
+																		<a href="#statusModal" data-toggle="modal" data-target="#statusModal" title="<%= property.ValidationMessage %>" >
+																				<span class="xecm_icon xecm_status_issue_icon"></span> 
+																		</a>
+																	<% } %>
+																</td>
+															</tr>
+															<% }); %>
+														</tbody>
+													</table>
+													</div>
+													<% }); %>
+												</div>
+										<% } else { %>
+									<br />
+									<p style="color: #DF3324;"><%= Globalize.localize("admin.config.ExtendedECM.ServiceContainerNoServiceContainer") %></p>
+								<% } %>
+								<% } else { %>	
+									<br />
+									<p style="color: #DF3324;"><%= Globalize.localize("admin.config.ExtendedECM.MpcEnabled") %></p>
+								<% } %>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- PE admin configuration Report -->
+				<div class="list-group-item accordion-group" id='peAdminReport'>
+					<div class="accordion-heading">
+				   		<h6 class="panel-title">
+							<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#peAdminReport' href='#peAdminConfiguration'>
+								<span class="accordian-toggle-text">
+									<%= Globalize.localize("admin.config.ExtendedECM.AdminConfigurationReport") %>
+								</span>
+							</a>
+				   		</h6>
+					</div> 
+					
+		
+					<div id='peAdminConfiguration' class="panel-collapse collapse">
+						<div class="accordion-inner">
+						<div class='table-responsive'>
+						
+				     	<% if(!this.model.canShowExternalizedElements){%>
+							<br />
+							<p style="color: #DF3324;margin-left: 16px;"><%= Globalize.localize("admin.config.ExtendedECM.MpcEnabled") %></p>
+						<% } else { %>	
+							
+							<br />
+							<div class="form-group">
+								<div class="controls">
+									<label><%= Globalize.localize("admin.config.Entities") %></label>
+									<select <%= this.getDisabled() %> class="form-control" name="selected-admin-entity" id="selected-admin-entity">
+										<option value="" disabled selected><%= Globalize.localize("admin.config.Entities.ExtendedECM.SelectEntity") %></option>
+										<% var self = this; _.each(self.model.entityConfig.get("entities"), function (entity,index) { %>
+											<% if(ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0]) { %>			
+												<option value="<%= entity.id %>"><%= entity.displayName %></option>						
+											<% }
+										})%>
+									</select>
+								</div>
+							</div>
+											<div class="tab-content">
+											<% var self =this;_.each(self.model.entityConfig.get("entities"), function (entity,index) { %>
+											<% if(ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0]) { %>
+											<div id="<%= entity.id+"admin"+entity.id %>" class="tab-pane fade in" >
+												<table class="table table-bordered">
+													<thead>
+														<label><%= Globalize.localize("admin.config.ExtendedECM.AdministratorConfiguration") %></label>
+														<tr>
+															<th><%= Globalize.localize("admin.config.ExtendedECM.ConfigurationElement") %></th>
+															<th><%= Globalize.localize("admin.config.ExtendedECM.ConfigurationValue") %></th>
+															<th><%= Globalize.localize("admin.config.ExtendedECM.Status") %></th>
+														</tr>
+														<tr>
+													      <td class='bws-table-column'><%= Globalize.localize("admin.config.ExtendedECM.ConfigurationName") %></td>
+														  <td class='bws-table-column'><%= ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['crossAppType'] %></td>
+														  <td class='bws-table-column'>
+														  <% if (ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['crossAppType']) { %>
+																	<span class="xecm_icon xecm_status_completed_icon"></span>        			
+															<%} else { %>
+																	<span class = "xecm_icon xecm_status_issue_icon"></span>
+															<%} %>
+															</td>
+													</tr>
+													<% var CrossAppType = ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['crossAppType'];
+														var externalSystemID = ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['externalSystemId'];
+														var workSpaceTypeID = ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['workspaceTypeID'];
+														var linkBusinessWorkspaceID = ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['linkBWSWorkspaceTypeID'];
+														var businessObjectType = ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['businessObjectType'];
+														var searchExpression = ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['searchExpression'];
+														var linkSearchExpression = ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0].definition['linkBWSSearchExpression']; %>
+													<% if(CrossAppType != 'None') { %>
+														<% if(CrossAppType != 'Link') { %>
+															<tr>
+													      	<td class='bws-table-column'><%= Globalize.localize("admin.config.Entities.ExtendedECM.ExtSysID") %></td>
+														  		<td class='bws-table-column'><%= externalSystemID %></td>
+														  		<% if (externalSystemID) { %>
+														  			<td><span class="xecm_icon xecm_status_completed_icon"></span></td>        			
+																	<%} else { %>
+														  			<td><span class="xecm_icon xecm_status_issue_icon"></span></td>
+														  		<%} %>
+															</tr>
+														<% } %>
+													<tr>
+														<td class='bws-table-column'><%= Globalize.localize("admin.config.Entities.ExtendedECM.WorkspaceTypeID") %></td>
+														<% if(CrossAppType != 'Link') { %>
+														<td class='bws-table-column'><%= workSpaceTypeID %></td>
+													<%} else { %>
+															<td class='bws-table-column'><%= linkBusinessWorkspaceID %></td>
+															<% if(CrossAppType == 'Link'){if (linkBusinessWorkspaceID) { %>
+																<td class='bws-table-column'><span class="xecm_icon xecm_status_completed_icon"></span></td>        			
+														<%} else { %>
+																<td class='bws-table-column'><span class="xecm_icon xecm_status_issue_icon"></span></td>
+														<%} %>
+													</td>
+														<%} }%>
+															<% if(CrossAppType != 'Link'){if (workSpaceTypeID) { %>
+																<td><span class="xecm_icon xecm_status_completed_icon"></span></td>        			
+															<%} else { %>
+															<td><span class="xecm_icon xecm_status_issue_icon"></span></td></td>
+														<%} }%>
+													</tr>
+													<tr>
+														<% if(CrossAppType != 'Link') { %>
+																<td class='bws-table-column'><%= Globalize.localize("admin.config.Entities.ExtendedECM.BusinessObjType") %></td>
+															<td class='bws-table-column'><%= businessObjectType %></td>
+																<% if (businessObjectType) { %>
+																	<td><span class="xecm_icon xecm_status_completed_icon"></span></td>        			
+															<%} else { %>
+																	<td><span class="xecm_icon xecm_status_issue_icon"></span></td></td>
+															<%} %>
+														<% } %>
+													</tr>
+													<tr>
+														<td><%= Globalize.localize("admin.config.Entities.ExtendedECM.SearchExpression") %></td>
+														<% if(CrossAppType != 'Link') { %>
+														<td><%= searchExpression %></td>
+														<%} else { %>
+														<td><%= linkSearchExpression %></td>
+															<% if(CrossAppType == 'Link'){if (linkSearchExpression) { %>
+																<td><span class="xecm_icon xecm_status_completed_icon"></span></td>        			
+														<%} else { %>
+															<td><span class="xecm_icon xecm_status_issue_icon"></span></td></td>											
+															<%} }%>
+															<%} %>
+														<% if(CrossAppType != 'Link'){if (searchExpression) { %>
+															<td><span class="xecm_icon xecm_status_completed_icon"></span></td>        			
+														<%} else { %>
+														<td><span class="xecm_icon xecm_status_issue_icon"></span></td></td>
+														<%} }%>
+													</tr>
+													<% } %>
+													</thead>
+												</table>
+											</div>
+											<%
+											}})
+											%>
+											</div>
+										</td>
+						
+						<% } %>
+							
+							</div>
+						</div>
+					</div>	
+				
+				</div>
+
+				<!-- Application Configuration Report --> 
+				<div class="list-group-item accordion-group" id='applicationReport'>
+					<div class="accordion-heading">
+				   		<h6 class="panel-title">
+							<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#applicationReport' href='#applicationReportConfiguration'>
+								<span class="accordian-toggle-text">
+									<%= Globalize.localize("admin.config.ExtendedECM.ApplicationConfigurationReportName") %>
+								</span>
+							</a>
+				   		</h6>
+					</div> 
+					<div id='applicationReportConfiguration' class="panel-collapse collapse">
+						<div class="accordion-inner">
+						<div class='table-responsive'>
+							<br />
+								<label><%= Globalize.localize("admin.config.Entities") %></label>
+										<div class="form-group">
+											<div class="controls">
+												<select <%= this.getDisabled() %> class="form-control" name="selected-application-entity" id="selected-application-entity">
+													<option value="" disabled="" selected=""><%= Globalize.localize("admin.config.Entities.ExtendedECM.SelectEntity") %></option>
+										<% var self =this;_.each(self.model.entityConfig.get("entities"), function (entity,index) { %>
+											<% if(ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0]) { %>
+												<option value="<%= entity.id %>"><%= entity.displayName %></option>
+																			<%
+														}})														
+														%>
+												</select>
+											</div>
+										</div>
+											<% var self =this;_.each(self.model.entityConfig.get("entities"), function (entity,index) { %>
+											<div id="<%= entity.id+"app"+entity.id %>" class="list-group applicationReport">
+												<table class="table table-bordered">
+													<thead>
+														<label><%= Globalize.localize("admin.config.ExtendedECM.ApplicationConfiguration") %></label>
+														<!-- <label>Application Configuration</label> -->
+														<tr>
+															<th><%= Globalize.localize("admin.config.ExtendedECM.PropertyName") %></th>
+															<th><%= Globalize.localize("admin.config.ExtendedECM.PropertyDatatype") %></th>
+															<th><%= Globalize.localize("admin.config.ExtendedECM.Size") %></th>
+														</tr>
+													</thead>
+													
+														<% 
+														_.each(self.getPropertyDetails(entity),function(propertyDetail){																
+														 %>
+														 <tr>
+															<td><%= propertyDetail.name %></td>
+															<td><%= propertyDetail.dataType %></td>
+															<td><%= propertyDetail.size %></td>
+														</tr>
+													
+																								<%
+															})
+															%>
+												</table>
+											</div>
+											<%
+															})
+															%>
+							</div>
+						</div>
+					</div>	
+				</div>
+				
+				<!-- Content server configuration report -->
+				<div class="list-group-item accordion-group" id='contentServerReport'>
+					<div class="accordion-heading">
+				   		<h6 class="panel-title">
+							<a class="accordion-toggle glyphicon glyphicon-chevron-right" data-toggle="collapse" data-parent='#contentServerReport' href='#contentServerReportConfiguration'>
+								<span class="accordian-toggle-text">
+									<%= Globalize.localize("admin.config.ExtendedECM.ContentServerReportName") %>							
+								</span>
+							</a>
+				   		</h6>
+					</div>
+					<div id='contentServerReportConfiguration' class="panel-collapse collapse">
+						<div class="accordion-inner">
+							<br />
+							<div id="configFileUploadDiv">
+								<label><%= Globalize.localize("admin.config.ExtendedECM.ContentServerConfigFile") %></label>
+								<form id="configFileUploadForm" method="POST" enctype="multipart/form-data">									
+									<label class="btn btn-primary btn-file <%= this.getDisabled() %>">
+										<%= Globalize.localize("admin.config.ExtendedECM.clChooseFile") %> 
+										<input <%= this.getDisabled() %> type="file" class="filestyle" id="configFileSelect" name="configFileSelect" style="display: none;">
+									</label>
+									<input type="text" id="fileName" style="border:none;width:300px" readonly="true" value="<%= Globalize.localize('admin.config.ExtendedECM.clNoFileChosen') %>" >										
+									<input type="text" id="fileUploadStatus" style="border:none;width:100%;" readonly="true"/>
+								</form>
+							</div>
+								
+							<div class="form-group">
+								<div class="controls">
+									<label><%= Globalize.localize("admin.config.Entities") %></label>
+									<select <%= this.getDisabled() %> class="form-control" name="selected-entity" id="selected-entity">
+										<option value="" disabled selected><%= Globalize.localize("admin.config.Entities.ExtendedECM.SelectEntity") %></option>
+										<% var self = this; _.each(self.model.entityConfig.get("entities"), function (entity,index) { %>
+											<% if(ot_App.solutionManager.getChildrenByTypeId(entity.id, ot_App.WellKnownElementGuids.BusinessWorkspaceConfiguration)[0]) { %>			<option value="<%= entity.id %>"><%= entity.displayName %></option>						
+											<% }
+										})%>
+									</select>
+								</div>
+							</div>							
+							
+							<div class="list-group" id="contentServerConfiguration">								
+							</div>			
+						</div>
+					</div>	
+				</div>			
+			
+			</div>
+			
+			<!-- Modal -->
+			<div id="statusModal" class="modal fade" role="dialog">
+			  <div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+				  <div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<span class = "xecm_icon xecm_status_issue_icon"></span>
+					<h4 style="margin-top: 8px;" class="modal-title"><%= Globalize.localize("admin.config.ExtendedECM.Warning") %></h4>
+				  </div>
+				  <div class="modal-body">
+					<p>Some issue with the configuration.</p>
+				  </div>
+				  <div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				  </div>
+				</div>
+
+			  </div>
+			</div>
+
+		</script>
+	<script id="contentServerConfiguration-template" type="text/template" class="template">		
+		<div class = "table-responsive" id="contentServerConfigurationReport">
+			<% var response = this.model; if (response !== null && response.BusinessObjectTypeConfiguration != null) { %>
+				<p><b><%= Globalize.localize("admin.config.ExtendedECM.BusinessObjectTypeConfiguration") %></b></p>
+					  <% if (response.BusinessObjectTypeConfiguration.Status) {%>	
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th><%= Globalize.localize("admin.config.ExtendedECM.ConfigurationElement") %></th>
+									<th><%= Globalize.localize("admin.config.ExtendedECM.ConfigurationValue") %></th>
+								</tr>
+							</thead>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.BusinessObjectName") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.Name %></td>
+							</tr>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.ExternalSystem") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.ExternalSystem %></td>
+							</tr>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.WorkspaceType") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.WorkspaceType %></td>
+							</tr>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.IsDefaultDisplayWorkspaceType") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.IsDefaultDisplayWorkspaceType %></td>
+							</tr>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.IsDefaultSearchWorkspaceType") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.IsDefaultSearchWorkspaceType %></td>
+							</tr>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.CanBeAddedAsBusinessObject") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.CanBeAddedAsBusinessObject %></td>
+							</tr>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.BusinessObjectNamePattern") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.BusinessObjectNamePattern %></td>
+							</tr>
+							<tr>
+							   <td><%= Globalize.localize("admin.config.ExtendedECM.WorkspaceTemplate") %></td>
+							   <td><%= response.BusinessObjectTypeConfiguration.WorkspaceTemplate %></td>
+							</tr>											
+						</table>
+												
+						<p><b><%= Globalize.localize("admin.config.ExtendedECM.BusinessPropertyMapping") %></b></p>
+						
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th><%= Globalize.localize("admin.config.ExtendedECM.Property") %></th>
+									<th><%= Globalize.localize("admin.config.ExtendedECM.PropertyDatatype") %></th>
+									<th><%= Globalize.localize("admin.config.ExtendedECM.CategoryAttribute") %></th>
+									<th><%= Globalize.localize("admin.config.ExtendedECM.CategoryDatatype") %></th>
+									<th><%= Globalize.localize("admin.config.ExtendedECM.Status") %></th>
+								</tr>
+							</thead>
+							
+							<% 															_.each(response.BusinessObjectTypeConfiguration.BusinessPropertyMapping,function(propertyMapping){																
+							%>
+								<tr>
+									<td><%= propertyMapping.EntityProperty %></td>
+									<td><%= propertyMapping.EntityDataType %></td>
+									<td><%= propertyMapping.CSAttribute %></td>
+									<td><%= propertyMapping.CSAttributeDataType %></td>
+									<td> 
+										<% if (propertyMapping.Status) { %>
+											<span class="xecm_icon xecm_status_completed_icon"></span>        			
+										<%} else { %>
+											<a id="<%= propertyMapping.EntityProperty %>" href="#statusModal" data-toggle="modal" data-target="#statusModal" title = "<%= propertyMapping.validationMsg %>" >
+												<span class = "xecm_icon xecm_status_issue_icon"></span> 
+											</a>  
+										<%} %> 
+									</td>
+								</tr>
+							
+							<%
+							})
+							%>
+						</table>
+												
+						<% if (response.canShowConnectedWorkspaceConfiguration) {%>						
+							<p><b><%= Globalize.localize("admin.config.ExtendedECM.BusinessWorkspaceTypeConfiguration") %></b></p>
+						
+							<% if (response.BusinessWorkspaceTypeConfiguration.Status) {%>
+								<table class="table table-bordered">
+									<thead>
+										<tr>
+											<th><%= Globalize.localize("admin.config.ExtendedECM.ConfigurationElement") %></th>
+											<th><%= Globalize.localize("admin.config.ExtendedECM.ConfigurationValue") %></th>
+										</tr>
+									</thead>
+									<tr>
+									   <td><%= Globalize.localize("admin.config.ExtendedECM.WorkspaceName") %></td>
+									   <td><%= response.BusinessWorkspaceTypeConfiguration.Name %></td>
+									</tr>
+									<tr>
+									   <td><%= Globalize.localize("admin.config.ExtendedECM.WorkspaceCreationLocation") %></td>
+									   <td><%= response.BusinessWorkspaceTypeConfiguration.WorkspaceCreationLocation %></td>
+									</tr>
+									<tr>
+									   <td><%= Globalize.localize("admin.config.ExtendedECM.WorkspaceCreationSubLocation") %></td>
+									   <td><%= response.BusinessWorkspaceTypeConfiguration.WorkspaceCreationSubLocation %></td>
+									</tr>
+									<tr>
+									   <td><%= Globalize.localize("admin.config.ExtendedECM.Classification") %></td>
+									   <td><%= response.BusinessWorkspaceTypeConfiguration.Classification %></td>
+									</tr>
+									<tr>
+									   <td><%= Globalize.localize("admin.config.ExtendedECM.WorkspaceNamePattern") %></td>
+									   <td><%= response.BusinessWorkspaceTypeConfiguration.BusinessWorkspaceNamePattern %></td>
+									</tr>
+								</table>
+							<%} else { %>
+									<p style="color: #DF3324;"><%= response.BusinessWorkspaceTypeConfiguration.Message %></p>
+							<% } %>
+						<% } %>						
+					<%} else { %>
+						<p style="color: #DF3324;"><%= response.BusinessObjectTypeConfiguration.Message %></p>
+					<% } %>
+				<% } else { %>
+					<p style="color: #DF3324;"><%= Globalize.localize("admin.config.ExtendedECM.ErrorMessage") %></p>
+			<% } %>
+		</div>
+	</script>
+	
+	<script id="pending-ddl-statements" type="template" class="template">
+			<div id="pending-database-statements">
+				<div>
+					<span><%= Globalize.localize("admin.config.PendingDDLStatement.applied.legend") %></span>
+				</div>
+				<div>
+					<textarea readonly id="pending-statements" rows="20" cols="80"></textarea>
+				</div>
+				<div>
+					<span><%= Globalize.localize("admin.config.PendingDDLStatement.applied.directions") %></span>
+				</div>
+				<div>
+					<button class="btn btn-primary" id="statements-have-been-applied"><%= Globalize.localize("admin.config.PendingDDLStatement.appliedButton") %></button>
+				</div>
+			</div>		
+		</script>
+		
+	<script id="configuration-properties" type="template" class="template">
+		<div class="form-group">
+			<% var self = this; if (this.model.getLayouts()) { %>
+				<% _.each(this.model.getLayouts(), function (layout) { %>
+					<a href="<%= self.model.getURL(layout.id) %>" class="list-group-item layout-selected" target="_blank">
+						<span class="btn-link"><%= layout.name %></span>
+					</a>
+				<% }); %>
+			<% } else { %>
+				<a href="<%= self.model.getURL(null) %>" class="list-group-item entity-selected" target="_blank">
+					<span class="btn-link"><%= this.model.getEntityName() %></span>
+				</a>
+			<%} %>
+		</div>
+	</script>		
+
+	<script id="entity-list-search-configuration" type="template" class="template">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 1rem; flex-wrap: wrap;">
+						<button class="btn btn-primary" type="button" disabled>
+							<%= Globalize.localize("admin.config.Entities.ConfigureFullTextSearch") %>
+						</button>
+						<button class="btn btn-cancel" type="button" disabled>
+							<%= Globalize.localize("admin.config.Entities.GetSearchConfigurationStatus") %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</script>
+
+	<script id="entity-list-search-configuration-table" type="template" class="template">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<% if (enableSelection) { %>
+						<th style="width: 50px;">
+							<div class="form-check text-center">
+								<input class="form-check-input" type="checkbox" data-id="checkbox" />
+							</div>
+						</th>
+					<% } %>
+					<th>
+						<div><%= Globalize.localize("admin.config.Entities") %></div>
+					</th>
+					<th>
+						<div><%= Globalize.localize("admin.config.Status") %></div>
+					</th>
+				</tr>
+			</thead>
+			<tbody />
+		</table>
+	</script>
+
+	<script id="entity-list-search-configuration-table-entry" type="template" class="template">
+		<% if (enableSelection) { %>
+			<td>
+				<div class="form-check text-center">
+					<input
+						class="form-check-input"
+						type="checkbox"
+						data-id="<%= displayName %>"
+						<%= selected ? "checked" : "" %>
+					/>
+				</div>
+			</td>
+		<% } %>
+		<td>
+			<div><%= displayName %></div>
+		</td>
+		<td></td>
+	</script>
+
+	<script id="entity-list-search-configuration-table-entry-status" type="template" class="template">
+		<img
+			src="/home/exampletenant/app/admin/web/images/<%= icon %>"
+			alt="<%= text %>"
+			style="margin-right: 0.5rem;"
+			width="16" height="16"
+		><%= text %>
+	</script>
+
+	<script>
+			AdminConfig.layout = new Backbone.Layout({
+				  template: "#layout",
+				  
+					events: {
+				        "click .logoff": "doLogout",
+						"change #orgSelection": "orgSelected",
+						"change #configSelection": "configSelected"
+					},
+					
+					el: ".main",
+				  
+				  views: {
+					  "#solutions": new AdminConfig.Views.Solutions({model: new AdminConfig.Models.Solutions()}),
+					  "#configurations": new AdminConfig.Views.Configurations({model: new AdminConfig.Models.Configurations()})
+				  },
+				  
+					doLogout: function () {
+						ot_App.doLogout();
+					},
+					
+					loadTenant: function() {
+					    ot_App.solutionManager.cleanCache();
+
+					    AdminConfig.layout.views["#solutions"].model.fetch().done(function() {
+					    	var solutionsView = AdminConfig.layout.getView("#solutions");
+							solutionsView.render();
+							solutionsView.solutionId = null;
+							solutionsView.versionId = null;
+							solutionsView.workspaceId = null;
+							$("body").trigger("solutionDeleted");
+						});						
+					},
+					
+					orgSelected: function (e) {
+						$(".configurable-elements-panel-col,.configuration-prop-panel-col").hide();
+						$(".default-panel").show();
+						var orgType = $('#orgSelection').val();
+						var solutionModel = AdminConfig.layout.views["#solutions"].model;
+						solutionModel.set("orgType", orgType);
+						
+						var tenantElement = ot_App.solutionManager.getCurrentUserTenantElement();
+						if (orgType === "Shared" 
+								&& tenantElement 
+								&& tenantElement.definition
+								&& tenantElement.definition.organizationId === 1) {								
+								$("#show-config-droplist").show();
+								 
+						} else {
+							$("#show-config-droplist").hide();
+							if (orgType === "Shared") {
+								solutionModel.set("orgType", "SharedForStriping");									
+							}
+						}
+						
+						this.loadTenant();
+					},
+
+					configSelected: function (e) {
+						$(".configurable-elements-panel-col,.configuration-prop-panel-col").hide();
+						$(".default-panel").show();
+						var configType = $('#configSelection').val();
+						var solutionModel = AdminConfig.layout.views["#solutions"].model;
+						if (configType === "SystemOrg") {
+							solutionModel.set("orgType", "SharedForStriping");
+	
+						} else {
+							solutionModel.set("orgType", "Shared");
+						}
+						var solutionsView = AdminConfig.layout.getView("#solutions");
+						solutionsView.render();
+						solutionsView.solutionId = null;
+						solutionsView.versionId = null;
+						solutionsView.workspaceId = null;
+						$("body").trigger("solutionDeleted");				
+					},
+			});
+			
+	        $("#alertDialog").hide();
+		    
+			AdminConfig.layout.views["#solutions"].model.fetch().done(function(){
+				AdminConfig.layout.render();
+			});		
+		</script>
+</body>
+</html>
+	
+	
+
+
+
+
+
+

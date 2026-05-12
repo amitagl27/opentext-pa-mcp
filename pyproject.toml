@@ -1,0 +1,113 @@
+[project]
+name = "opentext-pa-mcp"
+version = "0.1.0"
+description = "MCP server that exposes an OpenText AppWorks Platform entity service to Claude (and other MCP-compatible clients) through a small set of generic, plain-English tools."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Amit Agrawal", email = "amitagl27@gmail.com" },
+]
+requires-python = ">=3.11"
+keywords = [
+    "mcp",
+    "model-context-protocol",
+    "opentext",
+    "appworks",
+    "process-automation",
+    "claude",
+    "anthropic",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "fastmcp>=2.0,<3",
+    "httpx>=0.27,<1",
+]
+
+[project.urls]
+Homepage = "https://github.com/amitagl27/opentext-pa-mcp"
+Issues = "https://github.com/amitagl27/opentext-pa-mcp/issues"
+Source = "https://github.com/amitagl27/opentext-pa-mcp"
+
+[project.scripts]
+opentext-pa-mcp = "opentext_pa_mcp.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "respx>=0.21",
+    "ruff>=0.6",
+    "pyright>=1.1.380",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/opentext_pa_mcp"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/opentext_pa_mcp",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
+exclude = [
+    "docs/research/artifacts/*.html",
+    "docs/research/artifacts/openapi.json",
+    "tests/integration/.env",
+    "**/.env*",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "integration: tests that require a live AppWorks tenant (gated by env vars)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["docs/research/artifacts"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "B",        # flake8-bugbear
+    "UP",       # pyupgrade
+    "ASYNC",    # flake8-async
+    "SIM",      # flake8-simplify
+    "RUF",      # ruff-specific
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B011"]  # assert False is fine in tests
+
+[tool.pyright]
+include = ["src", "tests"]
+exclude = ["**/__pycache__", "**/.venv", "docs/research/artifacts"]
+typeCheckingMode = "basic"
+pythonVersion = "3.11"
+reportMissingImports = "error"
+reportMissingTypeStubs = "none"

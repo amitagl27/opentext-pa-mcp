@@ -1,0 +1,312 @@
+﻿
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>OpenText Authentication Service</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="./login2/bootstrap.min.css?v=23.4.0.7446">
+    <link rel="stylesheet" href="./login2/theme.css?v=23.4.0.7446">
+    <link rel="stylesheet" href="./login2/login2.css?v=23.4.0.7446">
+    <link rel="shortcut icon" href="./app_directory_services.ico">
+    
+    <script defer src="./jquery.min.js?v=23.4.0.7446"></script>
+    <script defer src="./bootstrap.min.js?v=23.4.0.7446"></script>
+    <script defer src="./login2/login2_custom.js?v=23.4.0.7446"></script>
+    <script defer src="./login2/scripts.js?v=23.4.0.7446"></script>
+    <script defer src="./login2/login.js?v=23.4.0.7446"></script>
+    
+    
+    
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="login-wrapper" role="main">
+      <div class="login-container">
+          
+
+<div class="branding ot-brand ot-brand--is-large ot-brand--is-stacked-centered ot-brand--is-dark">
+  <a class="ot-brand__logo">
+    <img src="./login2/signin-ot.svg" id="ot-logo" title="OpenText" alt='OpenText logo'>
+  </a>
+</div>
+
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+              <div class="login-message" role="alert" style="font-size: 1.6em;">
+              <p>
+                Sign in to continue to Appworks
+              </p>
+              </div>
+          
+          
+          
+          
+          <div class="login-form-wrapper">
+            <form method="POST" action="login" id="thisform">
+              <input type="hidden" id="logbackin" name="logbackin" value="" disabled>
+              <input type="hidden" id="pwreset" name="pwreset" value="" disabled>
+              <input type="hidden" id="signup" name="signup" value="" disabled>
+              <input type="hidden" id="cancel" name="cancel" value="" disabled>
+              <input type="hidden" id="changetenant" name="changetenant" value="" disabled>
+              
+              <input type="hidden" name="otdscsrf" value="43797b9bca08baa271204c7f6c61bfb9">
+              
+              <input type="hidden" name="fragment" id="fragment">
+              
+              
+                <input type="hidden" name="RFA" value="eyJhbGciOiJub25lIn0.eyJwb3N0VGlja2V0Ijp0cnVlLCJmb3J3YXJkQWRkcmVzcyI6Imh0dHA6Ly9tZWRpYS5vbmVlY20uY29tOjMzODEvaG9tZS9vbmVlY20vY29tLmVpYnVzLnNzby5vdGRzLlRpY2tldENvbnN1bWVyU2VydmljZS53Y3A_QXV0aENvbnRleHQ9TURFTE96RWVQNkRYZCUyQjVkTkpvbGpmVjhQRmZFYUlscUl5MTBtblUyR2tHODZFbElaSHk0RmpMQiZSZWxheVN0YXRlPUwyaHZiV1V2YjI1bFpXTnRMMkZ3Y0M5bGJuUnBkSGx6WlhKMmFXTmxMMDl1WlVWRFRVeGxaMkZzUTJGelpVMWhibUZuWlcxbGJuUSIsInJlc291cmNlSUQiOiJmNzNiYWE1MC1hYjA2LTQzMjUtOWFhMC01ZDE1MGEwMDBmZTEifQ">
+              
+              
+              
+              
+              <div class="form-group has-feedback">
+                <div class="col-md-20">
+                  <input id="otds_username" name="otds_username" type="text" class="form-control input-lg textbox hasclear required" 
+                  placeholder="User name" title="User name" aria-label="User name"
+                    data-otdsfocus autocomplete="off" value="">
+                    <button type="button" tabindex="-1" id="otds_username_clearer" class="clearer clear-icon form-control-feedback">Clear input</button>
+                </div>
+              </div>
+              
+              
+                  
+                  <div class="form-group has-feedback">
+                    <div class="col-md-20">
+                      <input id="otds_password" name="otds_password" type="password" class="form-control input-lg textbox hasclear required" 
+                      placeholder="Password" title="Password" aria-label="Password"
+                         autocomplete="off">
+                        <button type="button" tabindex="-1" id="otds_password_clearer" class="clearer clear-icon form-control-feedback">Clear input</button>
+                    </div>
+                  </div>
+                  
+                  
+                
+                
+                
+              
+              
+                <button id="loginbutton" type="submit" class="submit-btn" disabled>Sign in</button>
+              
+              
+              
+                  
+                    <input type="hidden" name="authhandler" id="authhandler">
+                  
+                  
+                      <div class="sign-in-with">
+                          Sign in with
+                          
+                            
+                            
+                            
+                            
+                            
+                            
+                                <input type="button" value="OKTA" class="other-authprovider-btn" id="okta">
+                            
+                          
+                            
+                            
+                            
+                            
+                            
+                      </div>
+                  
+              
+            </form>
+          </div>
+          
+          
+          
+            <div class="bottom-link"><a href="#" id="pwresetLink">Forgot Password</a></div>
+          
+          
+      </div>
+    </div>
+    <div class="push">
+    </div>
+</div>
+
+
+
+
+<div role="contentinfo">
+    
+    
+    <div class="modal fade" id="langModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+		<div class="modal-body">
+		  <div class="langinstruction" role="alert">
+			Select desired language
+		  </div>
+          <div class="lang-block">
+          
+          
+                
+                
+                <button class="lang-option" name="ar" lang="ar" id="lang-ar">العربية</button>
+          
+                
+                
+                <button class="lang-option" name="ca" lang="ca" id="lang-ca">català</button>
+          
+                
+                
+                <button class="lang-option" name="cs" lang="cs" id="lang-cs">čeština</button>
+          
+                
+                
+                <button class="lang-option" name="da" lang="da" id="lang-da">dansk</button>
+          
+                
+                
+                <button class="lang-option" name="de" lang="de" id="lang-de">Deutsch</button>
+          
+                
+                
+                <button class="lang-option" name="en" lang="en" id="lang-en">English</button>
+          
+                
+                
+                <button class="lang-option" name="es" lang="es" id="lang-es">español</button>
+          
+                
+                
+                <button class="lang-option" name="fi" lang="fi" id="lang-fi">suomi</button>
+          
+                
+                    </div>
+                    <div class="lang-block">
+                
+                
+                <button class="lang-option" name="fr" lang="fr" id="lang-fr">français</button>
+          
+                
+                
+                <button class="lang-option" name="he" lang="he" id="lang-he">עברית</button>
+          
+                
+                
+                <button class="lang-option" name="hu" lang="hu" id="lang-hu">magyar</button>
+          
+                
+                
+                <button class="lang-option" name="it" lang="it" id="lang-it">italiano</button>
+          
+                
+                
+                <button class="lang-option" name="ja" lang="ja" id="lang-ja">日本語</button>
+          
+                
+                
+                <button class="lang-option" name="kk" lang="kk" id="lang-kk">қазақ тілі</button>
+          
+                
+                
+                <button class="lang-option" name="ko" lang="ko" id="lang-ko">한국어</button>
+          
+                
+                
+                <button class="lang-option" name="nl" lang="nl" id="lang-nl">Nederlands</button>
+          
+                
+                    </div>
+                    <div class="lang-block">
+                
+                
+                <button class="lang-option" name="no" lang="no" id="lang-no">norsk</button>
+          
+                
+                
+                <button class="lang-option" name="pl" lang="pl" id="lang-pl">polski</button>
+          
+                
+                
+                <button class="lang-option" name="pt" lang="pt" id="lang-pt">português</button>
+          
+                
+                
+                <button class="lang-option" name="ro" lang="ro" id="lang-ro">română</button>
+          
+                
+                
+                <button class="lang-option" name="ru" lang="ru" id="lang-ru">русский</button>
+          
+                
+                
+                <button class="lang-option" name="sk" lang="sk" id="lang-sk">slovenčina</button>
+          
+                
+                
+                <button class="lang-option" name="sv" lang="sv" id="lang-sv">svenska</button>
+          
+                
+                
+                <button class="lang-option" name="tr" lang="tr" id="lang-tr">Türkçe</button>
+          
+                
+                    </div>
+                    <div class="lang-block">
+                
+                
+                <button class="lang-option" name="tw" lang="tw" id="lang-tw">Twi</button>
+          
+                
+                
+                <button class="lang-option" name="uk" lang="uk" id="lang-uk">українська</button>
+          
+                
+                
+                <button class="lang-option" name="zh" lang="zh" id="lang-zh">中文</button>
+          
+                
+                
+                <button class="lang-option" name="zh-CN" lang="zh-CN" id="lang-zh-CN">中文 (中国)</button>
+          
+                
+                
+                <button class="lang-option" name="zh-TW" lang="zh-TW" id="lang-zh-TW">中文 (台灣)</button>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="footer">
+    
+    <span class="login-copyright">
+        <br>
+        Copyright &copy; 2026 Open Text. All Rights Reserved.
+    </span>
+    </div>
+ 
+</div>
+
+</body>
+</html>
+
