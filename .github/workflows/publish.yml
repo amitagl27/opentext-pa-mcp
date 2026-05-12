@@ -1,0 +1,93 @@
+name: Publish to PyPI on main
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout (with previous commit)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.11"
+
+      - name: Detect version change in pyproject.toml
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
+          extract() {
+            # Extract the first `version = "..."` line under the [project] table.
+            awk '
+              /^\[/ { in_project = ($0 == "[project]") ? 1 : 0; next }
+              in_project && /^version[[:space:]]*=/ {
+                match($0, /"[^"]+"/)
+                print substr($0, RSTART+1, RLENGTH-2)
+                exit
+              }
+            ' "$1"
+          }
+
+          new_version=$(extract pyproject.toml)
+          if [ -z "$new_version" ]; then
+            echo "Could not parse version from pyproject.toml" >&2
+            exit 1
+          fi
+
+          if git rev-parse HEAD~1 >/dev/null 2>&1 && git show HEAD~1:pyproject.toml > /tmp/prev_pyproject.toml 2>/dev/null; then
+            old_version=$(extract /tmp/prev_pyproject.toml || echo "")
+          else
+            old_version=""
+          fi
+
+          echo "new=$new_version"   >> "$GITHUB_OUTPUT"
+          echo "old=$old_version"   >> "$GITHUB_OUTPUT"
+          if [ "$new_version" != "$old_version" ]; then
+            echo "changed=true"  >> "$GITHUB_OUTPUT"
+            echo "Version changed: '$old_version' -> '$new_version'"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Version unchanged ('$new_version'); skipping publish."
+          fi
+
+      - name: Install project (dev deps for tests)
+        if: steps.ver.outputs.changed == 'true'
+        run: uv sync --all-extras --dev
+
+      - name: Run unit tests
+        if: steps.ver.outputs.changed == 'true'
+        run: uv run pytest tests/unit
+
+      - name: Build sdist + wheel
+        if: steps.ver.outputs.changed == 'true'
+        run: |
+          rm -rf dist
+          uv build
+
+      - name: Publish to PyPI
+        if: steps.ver.outputs.changed == 'true'
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: uv publish
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### PyPI publish workflow"
+            echo ""
+            echo "- Old version: \`${{ steps.ver.outputs.old }}\`"
+            echo "- New version: \`${{ steps.ver.outputs.new }}\`"
+            echo "- Published:   \`${{ steps.ver.outputs.changed }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
