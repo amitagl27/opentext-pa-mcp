@@ -12,27 +12,38 @@ The server discovers the entire API surface (typically several hundred endpoints
 
 ## Status
 
-**v0.1.0 — read-only release.** Implementation complete, build artifacts in `dist/`, ready to publish to PyPI. See `PUBLISHING.md` for the upload steps and `READ-ME-FIRST-TOMORROW.md` for the end-to-end setup checklist.
+**v0.1.2 — read-only release, live on PyPI.** Install with `pip` and configure your MCP client.
 
 See `docs/research/findings.md` for the validated design and what we learned from probing a live AppWorks 23.4 instance.
 
-## How it will work (v1.0)
+## Install
 
-1. You add a snippet to your MCP client config (Claude Desktop, Claude Code, Cursor, etc.) that runs `uvx opentext-pa-mcp` with three env vars.
-2. `uvx` downloads the package from PyPI and runs it. No manual `pip install`, no clone.
-3. On startup the server logs into your AppWorks tenant via OTDS, fetches the entity service's OpenAPI spec, builds an entity catalog, and registers ~18 generic tools.
-4. You restart the MCP client. Done.
+The package is on PyPI as [`opentext-pa-mcp`](https://pypi.org/project/opentext-pa-mcp/). Anyone with Python 3.11+ can install it:
 
-Final config snippet for Claude Desktop's `%APPDATA%\Claude\claude_desktop_config.json` (or the Mac/Linux equivalents):
+```powershell
+pip install --user opentext-pa-mcp
+```
+
+That's it — no `uv`, `uvx`, `pipx`, or virtualenv tooling required. The package's entry point is reachable as `python -m opentext_pa_mcp`, so no `Scripts/` folder needs to be on PATH.
+
+To upgrade later when a new version is released:
+
+```powershell
+pip install --user --upgrade opentext-pa-mcp
+```
+
+## Configure your MCP client
+
+Add this snippet to your Claude Desktop config (`%APPDATA%\Claude\claude_desktop_config.json` on Windows, `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS). Same shape works in Claude Code, Cursor, and any other MCP client that supports stdio servers.
 
 ```json
 {
   "mcpServers": {
     "opentext-pa": {
-      "command": "uvx",
-      "args": ["opentext-pa-mcp"],
+      "command": "python",
+      "args": ["-m", "opentext_pa_mcp"],
       "env": {
-        "PA_SERVICE_URL": "http://your-host:3381/home/<tenant>/app/entityservice/<EntityServiceName>",
+        "PA_SERVICE_URL": "https://your-host:3381/home/<tenant>/app/entityservice/<EntityServiceName>",
         "PA_USERNAME": "<username>",
         "PA_PASSWORD": "<password>"
       }
@@ -40,6 +51,10 @@ Final config snippet for Claude Desktop's `%APPDATA%\Claude\claude_desktop_confi
   }
 }
 ```
+
+Fully quit Claude Desktop (system tray → Quit) and relaunch. On startup the server logs into your AppWorks tenant via OTDS, fetches the entity service's OpenAPI spec, builds an entity catalog, and registers all 9 tools.
+
+If your machine has multiple Python installations and Claude can't find the right one, replace `"command": "python"` with the full path to the interpreter, e.g. `"command": "C:\\Users\\you\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"`.
 
 Optional env vars:
 
@@ -51,6 +66,14 @@ Optional env vars:
 | `PA_CA_BUNDLE` | *(unset)* | Path to a PEM file containing your corporate root CA. Use this when AppWorks is on `https://` behind an internal CA. Preferred over disabling verification. Mutually exclusive with `PA_VERIFY_TLS=false`. |
 
 The `PA_SERVICE_URL` is **the exact URL you see in your browser** when looking at the Swagger UI of the entity service you want to expose. The server parses host, tenant, and service name out of it.
+
+## Try it
+
+After restarting Claude Desktop, ask things like:
+
+> *"What entities does opentext-pa expose?"*
+> *"Show me the first 5 legal categories."*
+> *"Describe the LegalCase entity."*
 
 ## v1.0 tool surface (9 tools)
 
