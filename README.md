@@ -12,9 +12,9 @@ The server discovers the entire API surface (typically several hundred endpoints
 
 ## Status
 
-**v0.1.2 — read-only release, live on PyPI.** Install with `pip` and configure your MCP client.
+**v0.1.3 — read-only release, live on PyPI.** Install with `pip` and configure your MCP client.
 
-See `docs/research/findings.md` for the validated design and what we learned from probing a live AppWorks 23.4 instance.
+Works against both OTDS-fronted AppWorks 23.x and Cordys-built-in Process Automation CE 25.x; the right login flow is picked automatically. See `docs/research/findings.md` for the validated design and what we learned from probing live instances.
 
 ## Install
 
@@ -52,7 +52,7 @@ Add this snippet to your Claude Desktop config (`%APPDATA%\Claude\claude_desktop
 }
 ```
 
-Fully quit Claude Desktop (system tray → Quit) and relaunch. On startup the server logs into your AppWorks tenant via OTDS, fetches the entity service's OpenAPI spec, builds an entity catalog, and registers all 9 tools.
+Fully quit Claude Desktop (system tray → Quit) and relaunch. On startup the server logs into your AppWorks tenant (OTDS or Cordys built-in SSO — auto-detected), fetches the entity service's OpenAPI spec, builds an entity catalog, and registers all 9 tools.
 
 If your machine has multiple Python installations and Claude can't find the right one, replace `"command": "python"` with the full path to the interpreter, e.g. `"command": "C:\\Users\\you\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"`.
 
@@ -64,8 +64,18 @@ Optional env vars:
 | `PA_REQUEST_TIMEOUT_S` | `30` | Per-request HTTP timeout in seconds. |
 | `PA_VERIFY_TLS` | `true` | Set to `false` to skip TLS certificate verification. **Insecure** — use only against dev/test servers with self-signed certs. |
 | `PA_CA_BUNDLE` | *(unset)* | Path to a PEM file containing your corporate root CA. Use this when AppWorks is on `https://` behind an internal CA. Preferred over disabling verification. Mutually exclusive with `PA_VERIFY_TLS=false`. |
+| `PA_AUTH_MODE` | `auto` | Login strategy. `auto` (default) inspects the login page and picks `otds` (AppWorks 23.x, OTDS-fronted) or `cordys` (Process Automation CE 25.x, Cordys built-in SSO). Set explicitly to `otds` or `cordys` only if auto-detection misfires. |
 
 The `PA_SERVICE_URL` is **the exact URL you see in your browser** when looking at the Swagger UI of the entity service you want to expose. The server parses host, tenant, and service name out of it.
+
+### Auth modes
+
+Two login flows are supported and the right one is picked automatically:
+
+- **OTDS form login** — used on AppWorks 23.x instances where OTDS sits in front of AppWorks on a separate port. Recognised by a login page with hidden `otdscsrf` and `RFA` form fields.
+- **Cordys built-in SSO** — used on Process Automation CE 25.x where AppWorks does its own SAML 1.1 SSO. Recognised by a "Process Automation Login" page served from `/wcp/sso/login.htm`.
+
+If startup fails with `AuthenticationError: Login page did not contain the expected csrf / RFA tokens` your instance is most likely Cordys-built-in but auto-detection didn't fire (custom reverse proxy, modified login page, etc.). Set `PA_AUTH_MODE=cordys` to force it. Similarly, set `PA_AUTH_MODE=otds` if you're on OTDS and detection misfires the other way.
 
 ## Try it
 

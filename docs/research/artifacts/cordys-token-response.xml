@@ -1,0 +1,21 @@
+<!--
+  Response from the AuthenticationToken.wcp artifact-consumer endpoint.
+
+  Request:
+    POST {base}/home/{tenant}/wcp/sso/com.eibus.sso.web.authentication.AuthenticationToken.wcp
+    Headers:
+      SAMLart: {ARTIFACT_FROM_SAML_RESPONSE}
+      Content-Type: text/plain
+    Body: (empty)
+
+  Response sets two Set-Cookie headers on the host (suffix derives from the
+  tenant name, lowercased + "inst", e.g. tenant "ExampleTenant" -> "exampletenantinst_*"):
+    {tenant}inst_SAMLart  - opaque artifact-derived session cookie, HttpOnly
+    {tenant}inst_ct       - UUID context cookie
+
+  Both cookies must be sent on subsequent API calls. On 401, repeat the
+  full Cordys login flow from the SAML SOAP request.
+-->
+<Response>
+  <Result>Success</Result>
+</Response>

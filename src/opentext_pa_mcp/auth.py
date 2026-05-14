@@ -1,17 +1,31 @@
-"""AppWorks HTTP client with OTDS form-login auth + on-401 re-login.
+"""AppWorks HTTP client with pluggable login strategies + on-401 re-login.
 
-The OTDS login flow is four HTTP steps:
+Two strategies are supported (see DEC-014):
+
+**OTDS** (AppWorks 23.x, OTDS-fronted). Four HTTP steps:
 
 1. GET the protected entity-service URL. The platform redirects through OTDS and ends on
    an HTML login page that contains an ``otdscsrf`` token and an ``RFA`` JWT-like token.
 2. POST credentials (``otds_username``, ``otds_password``) plus the two tokens to the
    OTDS login endpoint. The response is HTML containing an auto-submit form with a
    hidden ``OTDSTicket``.
-3. POST that ticket to the AppWorks TicketConsumerService. The response is the actual
-   protected resource (the Swagger UI HTML), and the session cookie is set.
+3. POST that ticket to the AppWorks TicketConsumerService. The session cookie is set.
 4. Use the resulting session cookie for subsequent API calls. On 401, re-run from step 1.
 
-Reference implementation in PowerShell: ``docs/research/artifacts/Login-Appworks.ps1``.
+**Cordys built-in SSO** (Process Automation CE 25.x). Three HTTP steps:
+
+1. POST a SAML 1.1 ``AuthenticationQuery`` SOAP envelope with a WS-Security
+   ``UsernameToken`` to ``{host}/home/{tenant}/com.eibus.web.soap.Gateway.wcp``.
+2. Take the returned ``<samlp:AssertionArtifact>`` value and POST it as the ``SAMLart``
+   header (with empty body) to ``.../wcp/sso/com.eibus.sso.web.authentication.AuthenticationToken.wcp``;
+   the server replies with session cookies.
+3. Use those cookies on subsequent API calls. On 401, re-run from step 1.
+
+Auto-detection (``PA_AUTH_MODE=auto``, the default) inspects the login page reached after
+the initial GET and routes to OTDS or Cordys based on the markers in the HTML.
+
+Reference: ``docs/research/artifacts/Login-Appworks.ps1`` (OTDS),
+``docs/research/artifacts/cordys-saml-request.xml`` (Cordys).
 """
 
 from __future__ import annotations
@@ -20,6 +34,8 @@ import asyncio
 import html
 import logging
 import re
+import uuid
+from datetime import UTC, datetime
 from types import TracebackType
 from typing import Any
 from urllib.parse import urljoin
@@ -32,6 +48,7 @@ from .errors import AuthenticationError, HttpError, NotFoundError
 logger = logging.getLogger(__name__)
 
 
+# --- OTDS patterns ----------------------------------------------------------------------
 _CSRF_PATTERN = re.compile(r'name="otdscsrf"\s+value="([^"]+)"')
 _RFA_PATTERN = re.compile(r'name="RFA"\s+value="([^"]+)"')
 # Locate the OTDS login form's action attribute. The form has id="thisform" and method=POST.
@@ -42,6 +59,52 @@ _LOGIN_FORM_ACTION_PATTERN = re.compile(
 _TICKET_FORM_PATTERN = re.compile(
     r'<form\s+action="([^"]+)"\s+method="post">.*?name="OTDSTicket"\s+value="([^"]+)"',
     re.DOTALL | re.IGNORECASE,
+)
+
+# --- Cordys patterns --------------------------------------------------------------------
+# Auto-detect markers: OTDS pages embed an otdscsrf hidden input; Cordys built-in pages
+# carry the "Process Automation Login" title or end up under wcp/sso/login.htm.
+_OTDS_MARKER_PATTERN = re.compile(r'name="otdscsrf"', re.IGNORECASE)
+_CORDYS_MARKER_PATTERN = re.compile(
+    r"<title>\s*Process Automation Login\s*</title>|/wcp/sso/login\.htm",
+    re.IGNORECASE,
+)
+# SAML response parsers.
+_SAML_ARTIFACT_PATTERN = re.compile(
+    r"<samlp:AssertionArtifact[^>]*>([^<]+)</samlp:AssertionArtifact>",
+    re.IGNORECASE,
+)
+_SOAP_FAULTSTRING_PATTERN = re.compile(
+    r"<faultstring[^>]*>([^<]+)</faultstring>",
+    re.IGNORECASE,
+)
+
+# SAML 1.1 AuthenticationQuery body used by the Cordys built-in SSO flow. See
+# docs/research/artifacts/cordys-saml-request.xml for the annotated template.
+_CORDYS_SAML_ENVELOPE = (
+    '<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">'
+    "<SOAP:Header>"
+    '<wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">'
+    "<wsse:UsernameToken>"
+    "<wsse:Username>{username}</wsse:Username>"
+    "<wsse:Password>{password}</wsse:Password>"
+    "</wsse:UsernameToken>"
+    "</wsse:Security>"
+    "</SOAP:Header>"
+    "<SOAP:Body>"
+    '<samlp:Request xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol"'
+    ' MajorVersion="1" MinorVersion="1"'
+    ' IssueInstant="{issue_instant}" RequestID="{request_id}">'
+    "<samlp:AuthenticationQuery>"
+    '<saml:Subject xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion">'
+    '<saml:NameIdentifier Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">'
+    "{username}"
+    "</saml:NameIdentifier>"
+    "</saml:Subject>"
+    "</samlp:AuthenticationQuery>"
+    "</samlp:Request>"
+    "</SOAP:Body>"
+    "</SOAP:Envelope>"
 )
 
 
@@ -104,7 +167,7 @@ class AppworksClient:
     async def api_get(self, path: str, *, params: dict[str, Any] | None = None) -> Any:
         """GET *path* under the entity-service REST API. Returns parsed JSON.
 
-        On 401, re-run the full OTDS login dance once and retry.
+        On 401, re-run the configured login flow once and retry.
 
         Args:
             path: Path under the API base, beginning with ``/`` (e.g. ``/<Service>/entities/Foo/lists/DefaultList``).
@@ -115,7 +178,7 @@ class AppworksClient:
         resp = await self._http.get(url, params=params, headers={"Accept": "application/json"})
 
         if resp.status_code == 401:
-            logger.info("API call returned 401; re-running OTDS login and retrying once.")
+            logger.info("API call returned 401; re-running login and retrying once.")
             self._authenticated = False
             await self._ensure_logged_in()
             resp = await self._http.get(url, params=params, headers={"Accept": "application/json"})
@@ -134,18 +197,41 @@ class AppworksClient:
             self._authenticated = True
 
     async def _login(self) -> None:
-        logger.info("Starting OTDS login for user %s.", self._config.username)
-        # Step 1: GET protected URL -> ends on OTDS login HTML.
+        """Dispatch to the configured login strategy.
+
+        - ``cordys``: POST the SAML envelope directly (no preliminary page fetch).
+        - ``otds``: GET the entity URL, then run the OTDS form-login dance.
+        - ``auto``: GET the entity URL, inspect the resulting HTML, and route.
+        """
+        mode = self._config.auth_mode
+        if mode == "cordys":
+            await self._cordys_login()
+            return
+
+        # 'otds' and 'auto' both need the initial GET — for OTDS to find the form
+        # tokens, and for auto-detect to decide which strategy to run.
         resp = await self._http.get(self._config.entity_service_url)
         login_html = resp.text
         page_url = str(resp.url)
+
+        resolved = mode if mode != "auto" else _detect_auth_mode(login_html, page_url)
+        if resolved == "otds":
+            await self._otds_login(login_html, page_url)
+        else:
+            await self._cordys_login()
+
+    async def _otds_login(self, login_html: str, page_url: str) -> None:
+        """Run the four-step OTDS form-login flow against an already-fetched login page."""
+        logger.info("Starting OTDS login for user %s.", self._config.username)
 
         csrf_match = _CSRF_PATTERN.search(login_html)
         rfa_match = _RFA_PATTERN.search(login_html)
         if not csrf_match or not rfa_match:
             raise AuthenticationError(
                 "Login page did not contain the expected csrf / RFA tokens. "
-                "Either the URL is not protected by OTDS, or the OTDS UI has changed."
+                "Either the URL is not protected by OTDS, or the OTDS UI has changed. "
+                "If this server uses Cordys built-in SSO, set PA_AUTH_MODE=cordys "
+                "or leave PA_AUTH_MODE unset to auto-detect."
             )
 
         # Parse the form action and resolve it relative to the page URL. The login form
@@ -179,6 +265,51 @@ class AppworksClient:
         await self._http.post(ticket_action, data={"OTDSTicket": otds_ticket})
         logger.info("OTDS login complete; session cookies stored.")
 
+    async def _cordys_login(self) -> None:
+        """Run the three-step Cordys built-in SSO flow."""
+        logger.info("Starting Cordys built-in SSO login for user %s.", self._config.username)
+        envelope = _build_cordys_saml_envelope(
+            username=self._config.username, password=self._config.password
+        )
+        gateway_url = (
+            f"{self._config.host}/home/{self._config.tenant}/com.eibus.web.soap.Gateway.wcp"
+        )
+        resp = await self._http.post(
+            gateway_url,
+            content=envelope,
+            headers={"Content-Type": "text/xml; charset=utf-8", "SOAPAction": ""},
+        )
+        body = resp.text
+
+        # Failure: SOAP fault with an invalidCredentials message code.
+        fault_match = _SOAP_FAULTSTRING_PATTERN.search(body)
+        if fault_match:
+            message = fault_match.group(1).strip()
+            raise AuthenticationError(
+                f"Cordys SSO rejected the supplied credentials: {message}"
+            )
+
+        # Success: extract the assertion artifact.
+        artifact_match = _SAML_ARTIFACT_PATTERN.search(body)
+        if not artifact_match:
+            raise AuthenticationError(
+                "Cordys SSO response did not contain a SAML AssertionArtifact. "
+                f"Gateway returned HTTP {resp.status_code}; the response shape is unexpected."
+            )
+        artifact = artifact_match.group(1).strip()
+
+        # Step 2: consume the artifact -> server sets the durable session cookies.
+        token_url = (
+            f"{self._config.host}/home/{self._config.tenant}"
+            f"/wcp/sso/com.eibus.sso.web.authentication.AuthenticationToken.wcp"
+        )
+        await self._http.post(
+            token_url,
+            content=b"",
+            headers={"SAMLart": artifact, "Content-Type": "text/plain"},
+        )
+        logger.info("Cordys SSO login complete; session cookies stored.")
+
     # --- Helpers --------------------------------------------------------------------------
 
     def _build_url(self, path: str) -> str:
@@ -208,6 +339,39 @@ def _resolve_verify(config: Config) -> bool | str:
     tests can assert the value without constructing an :class:`AppworksClient`.
     """
     return config.httpx_verify()
+
+
+def _detect_auth_mode(login_html: str, page_url: str) -> str:
+    """Return ``"otds"`` or ``"cordys"`` based on markers in the fetched login page.
+
+    Raises:
+        AuthenticationError: when neither set of markers is found. The caller is then
+            expected to instruct the user to set ``PA_AUTH_MODE`` explicitly.
+    """
+    if _OTDS_MARKER_PATTERN.search(login_html) or "/otdsws/" in page_url:
+        return "otds"
+    if _CORDYS_MARKER_PATTERN.search(login_html) or _CORDYS_MARKER_PATTERN.search(page_url):
+        return "cordys"
+    raise AuthenticationError(
+        "Could not auto-detect the AppWorks auth mode from the login page. "
+        "Set PA_AUTH_MODE=otds or PA_AUTH_MODE=cordys to override detection."
+    )
+
+
+def _build_cordys_saml_envelope(*, username: str, password: str) -> str:
+    """Render the SAML 1.1 AuthenticationQuery envelope for the Cordys SSO flow.
+
+    The username and password are XML-escaped; a fresh request ID and UTC timestamp
+    are generated per call so the server cannot reject as replay.
+    """
+    request_id = f"a{uuid.uuid4().hex}"
+    issue_instant = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return _CORDYS_SAML_ENVELOPE.format(
+        username=html.escape(username, quote=False),
+        password=html.escape(password, quote=False),
+        request_id=request_id,
+        issue_instant=issue_instant,
+    )
 
 
 def _extract_form_action(html_text: str) -> str | None:

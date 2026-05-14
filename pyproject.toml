@@ -1,6 +1,6 @@
 [project]
 name = "opentext-pa-mcp"
-version = "0.1.2"
+version = "0.1.3"
 description = "MCP server that exposes an OpenText AppWorks Platform entity service to Claude (and other MCP-compatible clients) through a small set of generic, plain-English tools."
 readme = "README.md"
 license = { text = "MIT" }

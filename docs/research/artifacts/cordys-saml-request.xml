@@ -1,0 +1,40 @@
+<!--
+  Reference SAML 1.1 AuthenticationQuery body for Cordys built-in SSO login.
+
+  POST to: {base}/home/{tenant}/com.eibus.web.soap.Gateway.wcp
+  Headers: Content-Type: text/xml; charset=utf-8
+           SOAPAction:          (empty)
+
+  Placeholders:
+    {USERNAME}    - AppWorks username (the literal "user@AuthScheme" string;
+                    on some instances this contains spaces, e.g. "user@Realm Inst Name")
+    {PASSWORD}    - plaintext password (Cordys built-in SSO uses WS-Security
+                    UsernameToken; transmit over HTTPS in production)
+    {ISSUE_INSTANT} - UTC timestamp in xsd:dateTime form, e.g. 2026-05-14T17:53:34Z
+    {REQUEST_ID}  - any unique string starting with a letter, e.g. a + uuid hex
+
+  Success response shape: see cordys-saml-response-example.xml
+  Failure response: SOAP Fault with cordys:MessageCode of
+    Cordys.ESBServer.Messages.invalidCredentials
+-->
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Header>
+    <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+      <wsse:UsernameToken>
+        <wsse:Username>{USERNAME}</wsse:Username>
+        <wsse:Password>{PASSWORD}</wsse:Password>
+      </wsse:UsernameToken>
+    </wsse:Security>
+  </SOAP:Header>
+  <SOAP:Body>
+    <samlp:Request xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol"
+                   MajorVersion="1" MinorVersion="1"
+                   IssueInstant="{ISSUE_INSTANT}" RequestID="{REQUEST_ID}">
+      <samlp:AuthenticationQuery>
+        <saml:Subject xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion">
+          <saml:NameIdentifier Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">{USERNAME}</saml:NameIdentifier>
+        </saml:Subject>
+      </samlp:AuthenticationQuery>
+    </samlp:Request>
+  </SOAP:Body>
+</SOAP:Envelope>

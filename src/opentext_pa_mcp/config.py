@@ -12,6 +12,7 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 from urllib.parse import urlsplit
 
 from .errors import ConfigurationError
@@ -25,6 +26,10 @@ ENV_REQUEST_TIMEOUT_S = "PA_REQUEST_TIMEOUT_S"
 ENV_ALLOW_WRITES = "PA_ALLOW_WRITES"
 ENV_VERIFY_TLS = "PA_VERIFY_TLS"
 ENV_CA_BUNDLE = "PA_CA_BUNDLE"
+ENV_AUTH_MODE = "PA_AUTH_MODE"
+
+AuthMode = Literal["auto", "otds", "cordys"]
+_VALID_AUTH_MODES: frozenset[str] = frozenset({"auto", "otds", "cordys"})
 
 
 @dataclass(frozen=True)
@@ -65,6 +70,12 @@ class Config:
     a corporate internal CA. Overrides system trust store. Mutually exclusive with
     ``verify_tls=False``."""
 
+    auth_mode: AuthMode = "auto"
+    """Which login strategy to use. ``auto`` (default) inspects the redirected login
+    page and picks OTDS form-login (AppWorks 23.x) or Cordys built-in SSO (Process
+    Automation CE 25.x). Override with ``otds`` or ``cordys`` only if auto-detection
+    misfires. See DEC-014."""
+
     def __repr__(self) -> str:
         # Custom repr keeps the password out of any log lines or crash dumps.
         return (
@@ -103,6 +114,7 @@ def load_config(env: dict[str, str] | None = None) -> Config:
     timeout = _parse_timeout(env.get(ENV_REQUEST_TIMEOUT_S))
     allow_writes = _parse_bool(env.get(ENV_ALLOW_WRITES), default=False)
     verify_tls, ca_bundle = _parse_tls_settings(env.get(ENV_VERIFY_TLS), env.get(ENV_CA_BUNDLE))
+    auth_mode = _parse_auth_mode(env.get(ENV_AUTH_MODE))
 
     return Config(
         service_url=service_url,
@@ -118,6 +130,7 @@ def load_config(env: dict[str, str] | None = None) -> Config:
         allow_writes=allow_writes,
         verify_tls=verify_tls,
         ca_bundle=ca_bundle,
+        auth_mode=auth_mode,
     )
 
 
@@ -220,3 +233,17 @@ def _parse_tls_settings(
         )
 
     return verify_tls, ca_bundle
+
+
+def _parse_auth_mode(raw: str | None) -> AuthMode:
+    """Validate and normalise ``PA_AUTH_MODE`` to ``auto`` | ``otds`` | ``cordys``."""
+    if raw is None:
+        return "auto"
+    value = raw.strip().lower()
+    if value not in _VALID_AUTH_MODES:
+        raise ConfigurationError(
+            f"{ENV_AUTH_MODE}={raw!r} is not valid. "
+            f"Expected one of: auto, otds, cordys (case-insensitive). "
+            f"Leave unset to auto-detect."
+        )
+    return value  # type: ignore[return-value]

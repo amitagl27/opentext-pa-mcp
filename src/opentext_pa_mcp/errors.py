@@ -18,9 +18,13 @@ class ConfigurationError(AppworksError):
 
 
 class AuthenticationError(AppworksError):
-    """OTDS login failed or the session expired and could not be renewed."""
+    """AppWorks login failed or the session expired and could not be renewed.
 
-    def __init__(self, message: str = "Authentication with OTDS failed.") -> None:
+    Covers both OTDS form-login (AppWorks 23.x) and Cordys built-in SSO (Process
+    Automation CE 25.x). See DEC-014.
+    """
+
+    def __init__(self, message: str = "Authentication with AppWorks failed.") -> None:
         super().__init__(message)
 
 

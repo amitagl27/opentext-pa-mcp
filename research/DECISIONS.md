@@ -84,6 +84,7 @@ Format per entry: ID, Date (absolute), Decision, Context, Alternatives, Rational
 
 **Date:** 2026-05-12
 **Decision:** Implement a small `OtdsAuth` httpx auth class that performs the four-step OTDS login flow on first use and re-runs it on 401 responses.
+**Update (2026-05-14):** This decision still stands for OTDS-fronted instances but is no longer the *only* supported flow. See `DEC-014` — the OTDS strategy now sits alongside a Cordys built-in SSO strategy with auto-detection.
 **Context:** AppWorks 23.4 protects entity services with OTDS SAML-like cookie sessions. The OpenAPI spec declares no security scheme, so consumers must handle auth out-of-band.
 **Alternatives considered:**
 - Require the user to paste a session cookie — rejected: cookies expire (SAML artifact is short-lived); breaks repeatable startup.
@@ -154,6 +155,19 @@ A `Config.httpx_verify()` helper produces the value to pass to `httpx.AsyncClien
 - Custom `httpx.SSLContext` builder env var — rejected: too much config surface; the two-knob form covers ~99% of use cases.
 - Probe and auto-disable on cert error — rejected: silently downgrading security is exactly the failure mode we want to avoid.
 **Rationale:** Two narrow knobs with clear precedence. CA bundle is the right answer for prod (still secure, just with a different trust root); `PA_VERIFY_TLS=false` is a clearly-labelled emergency exit for dev/test. The contradictory-config check + WARNING log keep users from foot-gunning themselves silently.
+
+---
+
+## DEC-014 — Auth: strategy pattern with auto-detection (OTDS + Cordys built-in)
+
+**Date:** 2026-05-14
+**Decision:** Support two authentication backends behind a single `AppworksClient`: OTDS form login (the original v1.0 flow per DEC-007) and Cordys built-in SSO (SAML 1.1 SOAP + WS-Security UsernameToken). Selection is auto by default — inspect the redirected login page; OTDS pages contain `otdscsrf`/`RFA` form fields, Cordys built-in pages land on `wcp/sso/login.htm` with `id="username"`/`id="password"` fields and no CSRF token. An optional env var `PA_AUTH_MODE` (`auto` | `otds` | `cordys`, default `auto`, case-insensitive) overrides detection.
+**Context:** The original v1.0 implementation (DEC-007) assumed OTDS-fronted AppWorks 23.x. A user reported (issue #2 on the public mirror) that AppWorks 25.1 "Process Automation CE" instances using Cordys built-in auth fail at startup with `AuthenticationError: Login page did not contain the expected csrf / RFA tokens`. Discovery against a live 25.1 instance confirmed a distinct three-step flow: (1) POST a SAML 1.1 `AuthenticationQuery` envelope with WSSE UsernameToken to `{base}/home/{tenant}/com.eibus.web.soap.Gateway.wcp`; (2) POST the returned `samlp:AssertionArtifact` as a `SAMLart` header to `{base}/home/{tenant}/wcp/sso/com.eibus.sso.web.authentication.AuthenticationToken.wcp`; (3) reuse the resulting `{tenant}inst_SAMLart` + `{tenant}inst_ct` cookies on subsequent API calls. Artifacts saved under `docs/research/artifacts/cordys-*.{html,xml}`.
+**Alternatives considered:**
+- Always require `PA_AUTH_MODE` to be set explicitly — rejected: users already have one env var (`PA_SERVICE_URL`) carrying enough info to disambiguate at runtime; another required knob is friction for the dominant single-platform case.
+- Auto-detect only, no override — rejected: a third (currently unknown) login-page shape would dead-end users with no escape hatch; an override is cheap insurance.
+- Probe `/com.eibus.web.soap.Gateway.wcp` for existence to decide — rejected: that path exists on OTDS-fronted instances too; the login page itself is the cleaner discriminator and we have to fetch it anyway.
+**Rationale:** Strategy pattern lets the two flows coexist without entangling their state machines (the SOAP/SAML flow has nothing in common with the form-POST/redirect-chain flow). Auto-detect is correct for ~all users on either platform; the env-var override covers the long tail without imposing on the majority. Detection runs on the same GET we already make as login-step-1, so there is zero extra HTTP cost. Reference: `src/opentext_pa_mcp/auth.py` (post-implementation) and `tests/unit/test_auth_cordys.py`.
 
 ---
 

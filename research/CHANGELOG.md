@@ -4,6 +4,31 @@ Narrative log of how the project reached its current state. New entries at the t
 
 ---
 
+## 2026-05-15 — v0.1.3: Cordys built-in SSO support
+
+First post-launch bug fix. Users reported (issue #2 on the public mirror) that the server crashed at startup on AppWorks 25.x "Process Automation CE" tenants with `AuthenticationError: Login page did not contain the expected csrf / RFA tokens`. Investigation against a live 25.1 instance showed AppWorks CE uses **Cordys built-in SSO** (SAML 1.1 SOAP + WS-Security `UsernameToken`) rather than OTDS form-login. Login pages and protocols are wholly different.
+
+**Approach** (see `DEC-014`): introduce a strategy-pattern dispatcher in `AppworksClient._login`, with auto-detection from the login-page HTML/URL markers as the default (`PA_AUTH_MODE=auto`). The original OTDS flow becomes one of two strategies; the new `CordysAuth` strategy runs three HTTP steps — POST SAML envelope to the SOAP gateway, POST returned artifact to `AuthenticationToken.wcp`, reuse the resulting `{tenant}inst_SAMLart`/`{tenant}inst_ct` cookies. New optional env var `PA_AUTH_MODE=otds|cordys` overrides detection if a custom proxy hides the markers.
+
+**Shipped:**
+- `src/opentext_pa_mcp/auth.py` — two-strategy dispatcher; new `_cordys_login`, `_detect_auth_mode`, `_build_cordys_saml_envelope` helpers.
+- `src/opentext_pa_mcp/config.py` — `auth_mode` field + `PA_AUTH_MODE` env var (`auto` default, `otds`, `cordys`).
+- `tests/unit/test_auth_cordys.py` — 8 new tests covering auto-detect routing, explicit-mode bypass, WSSE envelope contents, artifact handling, invalid-credentials, missing-artifact, unknown-shape errors, and 401-relogin.
+- `docs/research/artifacts/cordys-*.{html,xml}` — sanitised reference artifacts (login form, SAML request template, SAML response example, token-consumer response) for future spelunkers.
+- `README.md` — new "Auth modes" section + `PA_AUTH_MODE` row; status line updated to mention 25.x support.
+
+**Quality gates that held:**
+- `ruff check src tests` — clean.
+- `pyright src tests` — 0 errors, 0 warnings.
+- 112 unit tests passing (previously 100; the 12 new ones cover Cordys + `PA_AUTH_MODE`).
+- End-to-end smoke test via TestPyPI 0.1.3.dev1 install against a live Process Automation CE 25.1 tenant: auto-detect picked Cordys, SAML login succeeded, discovery reported 3 entities / 440 operations on the entity service under test.
+
+**Out of scope for this release:**
+- Issue #1 (Developer-Role startup failure) — separate root cause, tracked for v0.1.4.
+- Cordys-specific integration tests in `tests/integration/` — current integration suite is parameterised only for OTDS; needs a sweep later.
+
+---
+
 ## 2026-05-12 (later that day) — v0.1.0 implementation complete
 
 Overnight TDD build of the read-only v1.0 MCP server, ready to publish to PyPI.

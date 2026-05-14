@@ -24,6 +24,9 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> pytest.MonkeyPatch:
         "PA_LOG_LEVEL",
         "PA_REQUEST_TIMEOUT_S",
         "PA_ALLOW_WRITES",
+        "PA_AUTH_MODE",
+        "PA_VERIFY_TLS",
+        "PA_CA_BUNDLE",
     ]:
         monkeypatch.delenv(key, raising=False)
     return monkeypatch
@@ -262,6 +265,52 @@ class TestHttpxVerifyValue:
         clean_env.setenv("PA_CA_BUNDLE", str(ca))
         cfg = load_config()
         assert cfg.httpx_verify() == str(ca)
+
+
+class TestAuthMode:
+    """PA_AUTH_MODE selects which login strategy to use (DEC-014)."""
+
+    def test_defaults_to_auto(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_SERVICE_URL", VALID_URL)
+        clean_env.setenv("PA_USERNAME", "u")
+        clean_env.setenv("PA_PASSWORD", "p")
+        cfg = load_config()
+        assert cfg.auth_mode == "auto"
+
+    @pytest.mark.parametrize(
+        "value,expected",
+        [
+            ("auto", "auto"),
+            ("AUTO", "auto"),
+            ("otds", "otds"),
+            ("OTDS", "otds"),
+            ("Otds", "otds"),
+            ("cordys", "cordys"),
+            ("Cordys", "cordys"),
+            ("CORDYS", "cordys"),
+            ("  otds  ", "otds"),  # whitespace tolerated
+        ],
+    )
+    def test_accepted_values_normalise_to_lowercase(
+        self, clean_env: pytest.MonkeyPatch, value: str, expected: str
+    ) -> None:
+        clean_env.setenv("PA_SERVICE_URL", VALID_URL)
+        clean_env.setenv("PA_USERNAME", "u")
+        clean_env.setenv("PA_PASSWORD", "p")
+        clean_env.setenv("PA_AUTH_MODE", value)
+        cfg = load_config()
+        assert cfg.auth_mode == expected
+
+    @pytest.mark.parametrize("value", ["saml", "basic", "ntlm", "true", "", "  "])
+    def test_invalid_value_raises(
+        self, clean_env: pytest.MonkeyPatch, value: str
+    ) -> None:
+        clean_env.setenv("PA_SERVICE_URL", VALID_URL)
+        clean_env.setenv("PA_USERNAME", "u")
+        clean_env.setenv("PA_PASSWORD", "p")
+        clean_env.setenv("PA_AUTH_MODE", value)
+        with pytest.raises(ConfigurationError, match="PA_AUTH_MODE"):
+            load_config()
 
 
 class TestSecrecyOfRepr:

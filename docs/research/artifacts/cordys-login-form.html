@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html onapplicationready="appReady()">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Process Automation Login</title>
+
+		<script src="../application.js"></script>
+		<script src="/cordys/thirdparty/jquery/jquery.js"/></script>
+		<link rel="shortcut icon"	type="image/x-icon"	href="/cordys/favicon.ico">
+		<link rel="stylesheet"		type="text/css"	href="/cordys/wcp/sso/css/theme.css">
+		<link rel="stylesheet"		type="text/css"	href="/cordys/wcp/sso/css/login.css">
+		
+		<script type="text/javascript">
+
+			function appReady()
+			{
+				application.importType("wcp.library.util.AjaxToolKitTranslationUtil");
+
+				if ( system.isWindowAccessible(parent) ) {
+					var maximizedStyles = {top:"0px",left:"0px",position:"absolute",height:"100%",width:"100%",border:"0px",borderRadius:"0px",margin:"0px"};
+					$("#login", parent.document).css(maximizedStyles);//NOMBV
+					$("#mainContainer", parent.document).css(maximizedStyles);//NOMBV
+
+					//Workaround for BOP-55342: Force maximized settings without any decoration
+					$("#fb_titlebar", parent.document).css("display","none");//NOMBV
+					$("#feedback_wrapper", parent.document).css(maximizedStyles);//NOMBV
+					$("#feedbackbox", parent.document).css(maximizedStyles);//NOMBV
+					$("#fb_container", parent.document).css(maximizedStyles);//NOMBV
+				}
+
+				$('.clearer').click(clearField);
+				$('.clearer').click(resetSubmitState);
+				$('.hasclear').on('input', resetSubmitState);
+				$('.hasclear').each(resetSubmitState);
+				$("#username").attr("placeholder", AjaxToolKitTranslationUtil.translate("User Name"));
+				$("#password").attr("placeholder", AjaxToolKitTranslationUtil.translate("Password"));
+				if (!!navigator.userAgent.match(/Trident\/7\./)) {
+					$(".login-error").focus(); // workaround for IE11 issue: placeholder disappearing on focus
+				} else {
+					$("#username").focus();
+					$("#username").select();
+				}
+			}
+			
+			function doOnClick(iEventObject) 
+			{
+				if ($('#username').val().length == 0 || $('#password').val().length == 0) return;
+				getSSO().showError(false);
+				if (! getSSO().login($('#username').val(), $('#password').val()) ) {
+					$('#username_clearer').addClass('error-icon');
+					$('#password_clearer').addClass('error-icon');
+					$(".login-error").text(AjaxToolKitTranslationUtil.translate("Invalid credentials were entered"));
+					return;
+				}
+				$("body").css("cursor", "wait");
+				$("input").css("cursor", "wait");
+				var SAMLArtParam = "SAMLart=" + encodeURIComponent(getSSO().getArtifact())
+				var search = application.getParameter("search");
+				var path = application.getParameter("path");
+				if (! path) return;
+				
+				if (application.getParameter("usecookie") == "false") {
+					search = (search != ""  ?  search + "&" +SAMLArtParam : "?" +  SAMLArtParam) ;
+				}
+				var targetWindow = CordysRoot.sso.getTargetWindow().targetWindow;
+				targetWindow.location.href = path + search;
+			}
+
+			function getSSO()
+			{
+				if (!CordysRoot.sso) {
+					CordysRoot.application.addType(CordysRoot, "wcp.library.system.SSO");
+				}
+				return CordysRoot.sso;
+			}
+
+			function handleOnKeyUp(eventObject)
+			{
+				if (! eventObject ) eventObject = window.event; //NOMBV
+				var keyCode = eventObject.keyCode ? eventObject.keyCode : eventObject.which ? eventObject.which : eventObject.charCode;
+				if (keyCode == 13) doOnClick(eventObject);
+			}
+
+			function resetSubmitState()
+			{
+				var foundEmptyRequired = false;
+				$('.required').each(function(){
+					if (!foundEmptyRequired) {
+						foundEmptyRequired = ($(this).val().length == 0);
+					}
+				});
+				if (!foundEmptyRequired) {
+					$('.submit-btn').addClass('highlighted-btn');
+					$('.submit-btn').prop('disabled', false);
+				} else {
+					$('.submit-btn').removeClass('highlighted-btn');
+					$('.submit-btn').prop('disabled', true);
+				}
+				// Remove error when shown
+				if ($('#username_clearer').hasClass('error-icon')) $('#username_clearer').removeClass('error-icon');
+				if ($('#password_clearer').hasClass('error-icon')) $('#password_clearer').removeClass('error-icon');
+				$(".login-error").text(AjaxToolKitTranslationUtil.translate("Sign in to continue to Process Automation CE {0}","25.1"));
+
+				//Show or hide clearer
+				$(this).val().length ? $(this).next().show() : $(this).next().hide();
+			}
+	
+			function clearField()
+			{
+				$(this).prev().val('').focus();
+				$(this).hide();
+			}
+		</script>
+	</head>
+	<body>
+		<div cordystype="wcp.library.util.Translator" id="translator_sso_login" messageBundle="ajaxtoolkit/ajaxtoolkitmessagebundle"></div>
+		<div class="wrapper">
+			<div class="login-wrapper">
+				<div class="login-container">
+					<div class="branding">
+						<img src="/cordys/wcp/sso/css/sign_in_appworks_platform.svg" id="ot-logo" class="ot-logo">
+					</div>
+					
+					<div translatable="true" class="login-error">Sign in to continue to Process Automation CE 25.1</div>
+					
+					<div class="login-form-wrapper">
+						<div class="form-group has-feedback">
+							<div class="col-md-20">
+								<input id="username" name="username" type="text" onkeyup="handleOnKeyUp(event)" class="form-control input-lg textbox hasclear required" autocomplete="off">
+								<span id="username_clearer" class="clearer clear-icon form-control-feedback"/>
+							</div>
+						</div>
+						<div class="form-group has-feedback">
+							<div class="col-md-20">
+								<input id="password" name="password" type="password" onkeyup="handleOnKeyUp(event)" class="form-control input-lg textbox hasclear required" autocomplete="off">
+								<span id="password_clearer" class="clearer clear-icon form-control-feedback"/>
+							</div>
+						</div>
+						<input type="button" id="buttonOK" class="submit-btn" onclick="doOnClick(event)" translatable="true" value="Sign In">
+					</div>
+				</div>
+			</div>
+			
+			<div class="push">
+			</div>
+		</div>
+
+		<div class="footer">
+			<span class="login-copyright">Copyright © 2001-2025 Open Text. All Rights Reserved. Trademarks owned by Open Text.</span>
+		</div>
+
+	</body>
+</html>
