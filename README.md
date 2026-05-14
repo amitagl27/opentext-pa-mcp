@@ -77,6 +77,26 @@ Two login flows are supported and the right one is picked automatically:
 
 If startup fails with `AuthenticationError: Login page did not contain the expected csrf / RFA tokens` your instance is most likely Cordys-built-in but auto-detection didn't fire (custom reverse proxy, modified login page, etc.). Set `PA_AUTH_MODE=cordys` to force it. Similarly, set `PA_AUTH_MODE=otds` if you're on OTDS and detection misfires the other way.
 
+### Required AppWorks role
+
+At startup the server discovers the entity catalog by fetching the OpenAPI spec from `…/app/entityRestService/api/{Service}/docs`. That endpoint is gated by a narrow AppWorks platform role:
+
+> **`OpenText Entity Runtime` → `Entity REST API Developer`**
+
+Grant this role (under the `OpenText Entity Runtime` namespace) to every user who will run the MCP server. If you don't, startup fails with:
+
+```
+HttpError: Access denied. You do not have permissions to view this page. (HTTP 403)
+```
+
+**This role is the minimum needed and grants nothing dangerous.** Per OpenText's own documentation, `Entity REST API Developer` only enables the *channel* — the ability to call REST URLs and read the OpenAPI spec. All actual operations on entity data (create, read, update, delete, list, share, action invocation) remain governed by the entity's **Security building block** and **Sharing building block** configurations. In other words: a user with this role but no per-entity security grants can see *which* APIs exist, but they cannot read or change any data they wouldn't already be able to access.
+
+Practical guidance for admins:
+
+- Add `Entity REST API Developer` (namespace `OpenText Entity Runtime`) to your existing functional user roles, or to a dedicated `MCP Server User` group.
+- No other "Developer Role" / "Administrator" assignment is needed for the MCP server to work.
+- After granting the role, restart the MCP server — startup discovery will succeed and the catalog will reflect only the entities the user already has functional access to.
+
 ## Try it
 
 After restarting Claude Desktop, ask things like:
@@ -103,8 +123,9 @@ opentext-processautomation-mcp/
 ├── CONTRIBUTING.md     Branching, PRs, commit conventions
 ├── README.md           This file
 ├── pyproject.toml      Package manifest, dependencies, tool config
-├── research/           Decisions log, evolution changelog
 ├── docs/
+│   ├── DECISIONS.md    Architectural decisions (DEC-NNN entries)
+│   ├── CHANGELOG.md    Narrative product evolution log
 │   ├── research/       Validated discovery findings + reproducible artifacts
 │   ├── technical/      Architecture docs (future)
 │   └── product/        Feature specs (future)
@@ -123,5 +144,5 @@ opentext-processautomation-mcp/
 ## Authoritative references
 
 - `docs/research/findings.md` — what's true about the live AppWorks API.
-- `research/DECISIONS.md` — architectural decisions and why.
+- `docs/DECISIONS.md` — architectural decisions and why.
 - `CLAUDE.md` — working rules.

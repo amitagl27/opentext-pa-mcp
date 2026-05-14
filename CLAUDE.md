@@ -22,17 +22,18 @@ No feature code in `src/` shall be written, considered "Done", or merged unless 
 
 | Folder | Purpose | What belongs here | What does NOT belong here |
 |--------|---------|-------------------|---------------------------|
-| `research/` | Raw brainstorming, decisions, evolution | `DECISIONS.md`, `CHANGELOG.md`, exploration notes, archived dead-ends | Polished deliverables, code |
-| `docs/research/` | Reproducible discovery findings | Captured artifacts (`openapi.json`, sample responses, helper scripts), `findings.md`, `discovery-plan.md` | Active exploration |
+| `docs/` | Project documentation — decisions, evolution, and discovery, all under one roof | `DECISIONS.md`, `CHANGELOG.md`, and anything else that documents the project | Code, secrets, generated build output |
+| `docs/research/` | Reproducible discovery findings | Captured artifacts (`openapi.json`, sample responses, helper scripts), `findings.md`, `discovery-plan.md` | Active exploration; vendor-supplied material |
 | `docs/technical/` | Architecture documentation | System design, sequence diagrams, deployment notes | Application code |
 | `docs/product/` | Product specifications | Feature specs, user-facing config docs | Code, raw brainstorming |
+| `docs/fromcustomer/` | **Gitignored.** Vendor / customer-supplied reference material (platform docs, decompiled webapps, env probes) used during investigation but not part of the public repo | Vendor PDFs, decompiled JARs, screenshots of admin UIs, customer-shipped helper scripts | Anything we want to publish |
 | `src/opentext_pa_mcp/` | The Python package — production code | Domain modules: `auth/`, `discovery/`, `tools/`, `server.py`, `__main__.py` | Tests, docs, dead code |
 | `tests/unit/` | Fast, no-network tests | Pure-Python tests; HTTP mocked with `respx` | Integration tests |
 | `tests/integration/` | Tests against a live AppWorks tenant | End-to-end OTDS login, real `lists/DefaultList` calls | Tests that don't need a real server |
 
-**Root directory rule:** the workspace root contains ONLY `.claude/`, `.gitignore`, `.python-version`, `CLAUDE.md`, `README.md`, `CONTRIBUTING.md`, `LICENSE`, `pyproject.toml`, `uv.lock`, and the four top-level directories (`research/`, `docs/`, `src/`, `tests/`). No build artifacts, no `__pycache__`, no `dist/` checked in.
+**Root directory rule:** the workspace root contains ONLY `.claude/`, `.gitignore`, `.python-version`, `CLAUDE.md`, `README.md`, `CONTRIBUTING.md`, `LICENSE`, `pyproject.toml`, `uv.lock`, and the three top-level directories (`docs/`, `src/`, `tests/`). No build artifacts, no `__pycache__`, no `dist/` checked in. The earlier root-level `research/` folder has been retired — its `DECISIONS.md` and `CHANGELOG.md` now live at `docs/DECISIONS.md` and `docs/CHANGELOG.md`.
 
-**Note for readers of the original template:** This deviates from the template's `codebase/src/` and `codebase/tests/` layout. Reason: every Python tool (`uv`, `pip`, `pytest`, `uvx`) expects `pyproject.toml` at the project root. Putting it inside `codebase/` works but breaks `uvx opentext-pa-mcp` (our v1.0 install story) and tooling defaults. We keep the *spirit* of the rule (code separated from docs/research) but use the Python-native layout.
+**Note for readers of the original template:** This deviates from the template's `codebase/src/` and `codebase/tests/` layout. Reason: every Python tool (`uv`, `pip`, `pytest`, `uvx`) expects `pyproject.toml` at the project root. Putting it inside `codebase/` works but breaks `uvx opentext-pa-mcp` (our v1.0 install story) and tooling defaults. We keep the *spirit* of the rule (code separated from docs) but use the Python-native layout.
 
 ---
 
@@ -40,18 +41,18 @@ No feature code in `src/` shall be written, considered "Done", or merged unless 
 
 When making architectural choices, consult these in order. Lower-numbered sources override higher-numbered ones.
 
-1. **`research/DECISIONS.md`** — accepted decisions with rationale. Authoritative for "what did we agree to and why".
+1. **`docs/DECISIONS.md`** — accepted decisions with rationale. Authoritative for "what did we agree to and why".
 2. **`docs/research/findings.md`** — what we know to be true about the live AppWorks API (validated by saved artifacts). Authoritative for "how does the platform actually behave".
 3. **The OpenAPI spec at `docs/research/artifacts/openapi.json`** — authoritative for "what endpoints exist and what shape do they have".
 4. **The code itself** — authoritative for "what does this codebase currently do".
 
-If you find a conflict between these, log it in `research/DECISIONS.md` and resolve it explicitly. Do not silently paper over.
+If you find a conflict between these, log it in `docs/DECISIONS.md` and resolve it explicitly. Do not silently paper over.
 
 ---
 
 ## Rule 3: Decision Traceability
 
-Any significant architectural, design, or strategic decision must be logged in `research/DECISIONS.md` with:
+Any significant architectural, design, or strategic decision must be logged in `docs/DECISIONS.md` with:
 - **ID** (`DEC-NNN`, monotonically increasing)
 - **Date** (absolute, not relative)
 - **Decision** (what was chosen)
@@ -59,7 +60,7 @@ Any significant architectural, design, or strategic decision must be logged in `
 - **Alternatives considered** (with one-line rejection reason for each)
 - **Rationale** (why this option won)
 
-Additionally, every significant milestone must be recorded in `research/CHANGELOG.md` — a narrative product evolution journal that documents how and why the product reached its current state.
+Additionally, every significant milestone must be recorded in `docs/CHANGELOG.md` — a narrative product evolution journal that documents how and why the product reached its current state.
 
 ---
 
@@ -97,6 +98,6 @@ Additionally, every significant milestone must be recorded in `research/CHANGELO
 - **Stack:** Python 3.11+, `fastmcp` (or low-level `mcp` SDK), `httpx`, stdio transport
 - **Config (env vars):** `PA_SERVICE_URL`, `PA_USERNAME`, `PA_PASSWORD`, optional `PA_LOG_LEVEL`
 - **Distribution:** PyPI, installed via `uvx opentext-pa-mcp`. No DXT bundles.
-- **Tool surface:** ~18 generic verb tools covering 700+ underlying endpoints by passing entity/list/action names as arguments. See `research/DECISIONS.md: DEC-005`.
+- **Tool surface:** ~18 generic verb tools covering 700+ underlying endpoints by passing entity/list/action names as arguments. See `docs/DECISIONS.md: DEC-005`.
 
 **v1.0 scope: read-only.** Write operations (create, update, delete, invoke_action) ship in v1.1 behind a `PA_ALLOW_WRITES=true` flag. Rationale: AppWorks actions like `Submit` and `Accept` are not idempotent; a misbehaving LLM should not be able to mutate cases until users explicitly opt in.

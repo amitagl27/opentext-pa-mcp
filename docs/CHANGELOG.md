@@ -4,6 +4,19 @@ Narrative log of how the project reached its current state. New entries at the t
 
 ---
 
+## 2026-05-15 (later) — Docs: required AppWorks role + folder reorganisation
+
+While investigating public-mirror issue #1 ("server doesn't start without Developer Role"), we walked the deployed `entityRestService` webapp and the embedded `entityCore.jar` and found the exact gate: `EntityRestResourceService.getAPI()` does an `isInRole("OpenText Entity Runtime#Entity REST API Developer")` check before serving `/api/{Service}/docs`. Per OpenText's own documentation the role only grants the API *channel* (URL access + Swagger doc visibility) — it does **not** bypass entity-level Security / Sharing building blocks. So granting it adds no real data exposure beyond what the user already has via their functional roles.
+
+**Outcome:** documented the requirement in `README.md` under "Required AppWorks role" with the exact role string and the reassurance text from OpenText's own docs. No code change. Issue #1 closeable as "configuration requirement, not a bug."
+
+**Folder reorg landed in the same commit:**
+- Root-level `research/` retired. `research/DECISIONS.md` → `docs/DECISIONS.md`, `research/CHANGELOG.md` → `docs/CHANGELOG.md`. All project documentation now lives under `docs/`.
+- New `docs/fromcustomer/` directory for vendor- and customer-supplied reference material (platform docs, decompiled webapps, env probes). Gitignored — used during investigation, never shipped in the public repo.
+- `CLAUDE.md` Rule 1 updated to match. `DEC-008` carries a 2026-05-15 supersession note for the same reason.
+
+---
+
 ## 2026-05-15 — v0.1.3: Cordys built-in SSO support
 
 First post-launch bug fix. Users reported (issue #2 on the public mirror) that the server crashed at startup on AppWorks 25.x "Process Automation CE" tenants with `AuthenticationError: Login page did not contain the expected csrf / RFA tokens`. Investigation against a live 25.1 instance showed AppWorks CE uses **Cordys built-in SSO** (SAML 1.1 SOAP + WS-Security `UsernameToken`) rather than OTDS form-login. Login pages and protocols are wholly different.
@@ -66,7 +79,7 @@ Highlights of the discovery (full report: `docs/research/findings.md`):
 - The URL pattern is highly uniform: every entity follows the same 6 sub-patterns (collection, item, named list, child entity, relationship, action). The 793-op surface collapses to **~16 URL templates** parameterized by entity/list/action names. This means ~18 generic MCP tools can cover the whole surface.
 - Authentication is OTDS form login on a separate port, reproducible non-interactively. A working PowerShell helper was committed at `docs/research/artifacts/Login-Appworks.ps1`.
 
-Project-level decisions locked today (see `research/DECISIONS.md`):
+Project-level decisions locked today (see `docs/DECISIONS.md`):
 - DEC-001…007 — language, transport, distribution, config shape, tool design, spec discovery, auth.
 - DEC-008 — Python-native repo layout (`src/`, `tests/`, `pyproject.toml` at root) instead of the template's `codebase/` wrap.
 - DEC-009 — v1.0 is read-only; writes ship in v1.1 behind `PA_ALLOW_WRITES=true`.

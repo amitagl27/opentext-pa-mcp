@@ -51,6 +51,10 @@ docs/research/artifacts/session.xml
 docs/research/artifacts/session-cookies.txt
 docs/research/artifacts/post-login-response.html
 
+# Vendor / customer-supplied material (platform docs, decompiled webapps, env
+# probes) lives under docs/fromcustomer/ and stays out of the public repo.
+docs/fromcustomer/
+
 # OS
 Thumbs.db
 desktop.ini

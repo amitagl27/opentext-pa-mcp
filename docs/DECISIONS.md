@@ -98,6 +98,7 @@ Format per entry: ID, Date (absolute), Decision, Context, Alternatives, Rational
 
 **Date:** 2026-05-12
 **Decision:** Project root contains `pyproject.toml`, `src/opentext_pa_mcp/`, `tests/`, `research/`, `docs/`. We do **not** wrap code inside a `codebase/` directory as the original CLAUDE.md template suggested.
+**Update (2026-05-15):** The root-level `research/` folder has been retired and its `DECISIONS.md` + `CHANGELOG.md` moved to `docs/DECISIONS.md` and `docs/CHANGELOG.md`. Discovery artifacts continue to live under `docs/research/`. The Python-native spirit of this decision is unchanged — only the location of decision/changelog files has consolidated under `docs/`. See `CLAUDE.md` Rule 1.
 **Context:** Project owner provided a CLAUDE.md template (originally written for a JS/TS monorepo called ReadNest) that mandated `codebase/src/` and `codebase/tests/`.
 **Alternatives considered:**
 - Keep `codebase/` exactly as in the template — rejected: every Python tool (`uv`, `pip`, `pytest`, `uvx`) expects `pyproject.toml` at the project root. Wrapping in `codebase/` would break `uvx opentext-pa-mcp` (the v1.0 install story per `DEC-003`) and would require non-standard tooling configuration that every Python contributor would have to learn.
