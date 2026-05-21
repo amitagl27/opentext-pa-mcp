@@ -8,4 +8,4 @@ See README.md and docs/research/findings.md for the validated architecture.
 
 from __future__ import annotations
 
-__version__ = "0.1.3"
+__version__ = "0.2.0"

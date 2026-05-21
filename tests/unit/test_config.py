@@ -27,6 +27,9 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> pytest.MonkeyPatch:
         "PA_AUTH_MODE",
         "PA_VERIFY_TLS",
         "PA_CA_BUNDLE",
+        "PA_TRANSPORT",
+        "PA_HTTP_HOST",
+        "PA_HTTP_PORT",
     ]:
         monkeypatch.delenv(key, raising=False)
     return monkeypatch
@@ -302,9 +305,7 @@ class TestAuthMode:
         assert cfg.auth_mode == expected
 
     @pytest.mark.parametrize("value", ["saml", "basic", "ntlm", "true", "", "  "])
-    def test_invalid_value_raises(
-        self, clean_env: pytest.MonkeyPatch, value: str
-    ) -> None:
+    def test_invalid_value_raises(self, clean_env: pytest.MonkeyPatch, value: str) -> None:
         clean_env.setenv("PA_SERVICE_URL", VALID_URL)
         clean_env.setenv("PA_USERNAME", "u")
         clean_env.setenv("PA_PASSWORD", "p")
@@ -321,3 +322,120 @@ class TestSecrecyOfRepr:
         cfg = load_config()
         assert "supersecret" not in repr(cfg)
         assert "***" in repr(cfg) or "REDACTED" in repr(cfg)
+
+
+class TestTransport:
+    """PA_TRANSPORT selects stdio (default, single-user subprocess) vs http
+    (hosted, per-request credentials supplied as HTTP headers). See DEC-015.
+    """
+
+    def test_transport_defaults_to_stdio(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_SERVICE_URL", VALID_URL)
+        clean_env.setenv("PA_USERNAME", "u")
+        clean_env.setenv("PA_PASSWORD", "p")
+        cfg = load_config()
+        assert cfg.transport == "stdio"
+
+    @pytest.mark.parametrize(
+        "value,expected",
+        [
+            ("stdio", "stdio"),
+            ("STDIO", "stdio"),
+            ("http", "http"),
+            ("HTTP", "http"),
+            ("Http", "http"),
+            ("  http  ", "http"),
+        ],
+    )
+    def test_accepted_transport_values_normalise(
+        self, clean_env: pytest.MonkeyPatch, value: str, expected: str
+    ) -> None:
+        # http mode does not need tenant creds at startup.
+        clean_env.setenv("PA_TRANSPORT", value)
+        if expected == "stdio":
+            clean_env.setenv("PA_SERVICE_URL", VALID_URL)
+            clean_env.setenv("PA_USERNAME", "u")
+            clean_env.setenv("PA_PASSWORD", "p")
+        cfg = load_config()
+        assert cfg.transport == expected
+
+    @pytest.mark.parametrize("value", ["sse", "websocket", "tcp", "", "  "])
+    def test_invalid_transport_raises(self, clean_env: pytest.MonkeyPatch, value: str) -> None:
+        clean_env.setenv("PA_TRANSPORT", value)
+        with pytest.raises(ConfigurationError, match="PA_TRANSPORT"):
+            load_config()
+
+    def test_http_host_defaults_to_loopback(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_TRANSPORT", "http")
+        cfg = load_config()
+        # Default to 127.0.0.1 — safer than 0.0.0.0 when users don't know to bind explicitly.
+        assert cfg.http_host == "127.0.0.1"
+
+    def test_http_host_overridable(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_TRANSPORT", "http")
+        clean_env.setenv("PA_HTTP_HOST", "0.0.0.0")
+        cfg = load_config()
+        assert cfg.http_host == "0.0.0.0"
+
+    def test_http_port_default(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_TRANSPORT", "http")
+        cfg = load_config()
+        assert cfg.http_port == 8000
+
+    def test_http_port_overridable(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_TRANSPORT", "http")
+        clean_env.setenv("PA_HTTP_PORT", "9090")
+        cfg = load_config()
+        assert cfg.http_port == 9090
+
+    @pytest.mark.parametrize("value", ["not-a-number", "0", "-1", "70000"])
+    def test_http_port_invalid_raises(self, clean_env: pytest.MonkeyPatch, value: str) -> None:
+        clean_env.setenv("PA_TRANSPORT", "http")
+        clean_env.setenv("PA_HTTP_PORT", value)
+        with pytest.raises(ConfigurationError, match="PA_HTTP_PORT"):
+            load_config()
+
+    def test_http_mode_does_not_require_tenant_credentials(
+        self, clean_env: pytest.MonkeyPatch
+    ) -> None:
+        """In http mode credentials arrive per-request via headers, so the server
+        starts without them. PA_SERVICE_URL/PA_USERNAME/PA_PASSWORD become optional
+        defaults rather than required startup fields."""
+        clean_env.setenv("PA_TRANSPORT", "http")
+        cfg = load_config()
+        assert cfg.transport == "http"
+        assert cfg.service_url == ""
+        assert cfg.username == ""
+        assert cfg.password == ""
+        assert cfg.host == ""
+        assert cfg.tenant == ""
+        assert cfg.service_name == ""
+        assert cfg.api_base == ""
+        assert cfg.entity_service_url == ""
+
+    def test_http_mode_with_defaults_passed_through(self, clean_env: pytest.MonkeyPatch) -> None:
+        """If a user does set PA_SERVICE_URL/USERNAME/PASSWORD in http mode, they
+        survive as server-level defaults that later get merged with per-request headers."""
+        clean_env.setenv("PA_TRANSPORT", "http")
+        clean_env.setenv("PA_SERVICE_URL", VALID_URL)
+        clean_env.setenv("PA_USERNAME", "default-user")
+        clean_env.setenv("PA_PASSWORD", "default-pass")
+        cfg = load_config()
+        assert cfg.service_url == VALID_URL
+        assert cfg.username == "default-user"
+        assert cfg.password == "default-pass"
+        assert cfg.tenant == "exampletenant"
+
+    def test_stdio_mode_still_requires_service_url(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_TRANSPORT", "stdio")
+        clean_env.setenv("PA_USERNAME", "u")
+        clean_env.setenv("PA_PASSWORD", "p")
+        with pytest.raises(ConfigurationError, match="PA_SERVICE_URL"):
+            load_config()
+
+    def test_stdio_mode_still_requires_username(self, clean_env: pytest.MonkeyPatch) -> None:
+        clean_env.setenv("PA_TRANSPORT", "stdio")
+        clean_env.setenv("PA_SERVICE_URL", VALID_URL)
+        clean_env.setenv("PA_PASSWORD", "p")
+        with pytest.raises(ConfigurationError, match="PA_USERNAME"):
+            load_config()

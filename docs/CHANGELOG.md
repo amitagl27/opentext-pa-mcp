@@ -4,6 +4,75 @@ Narrative log of how the project reached its current state. New entries at the t
 
 ---
 
+## 2026-05-21 — v0.2.0 public release: container image moves to the public account
+
+The Azure Container Apps deployment path is promoted to `main` and the public mirror. It was verified end-to-end first: a one-click deployment was exercised from the SIT branch, and a Microsoft Copilot Studio agent successfully queried live `PolicyIntimation` records through the deployed MCP server against a real AppWorks tenant.
+
+**Changed** (see `DEC-017`): the OCI image is now published to `ghcr.io/amitagl27/opentext-pa-mcp` — the same account as the public repo — instead of `ghcr.io/tlcfworks/process-automation-mcp`. `publish-image.yml` still runs in the private `tlcfworks` repo but logs in to GHCR with the `amitagl27` PAT (`DESTINATION_REPO_PAT`) so the package lands under the public account and links to the public repo. `azuredeploy.json`, `deploy/azure/README.md`, the Dockerfile, the Power Platform connector, the root `README.md`, and the new deployment guide all reference the new path.
+
+**Added:**
+- `docs/azure-copilot-deployment-guide.md` — end-to-end walkthrough: one-click Azure deploy, Power Platform custom connector, Copilot agent creation, test/publish, and a troubleshooting table built from the issues hit during the first real wiring.
+
+Merging this to `main` triggers the public-repo sync, builds the image under `amitagl27`, and publishes `0.2.0` to PyPI.
+
+---
+
+## 2026-05-16 — Deployment pivot: Azure Container Apps replaces Hugging Face Space
+
+Brief detour to wire up Microsoft Copilot Studio against the v0.2.0 HTTP-mode server exposed the structural problem with the original deployment shape. A shared MCP on a public host (Hugging Face Space) only works in a multi-tenant world if Copilot Studio can pass the per-tenant AppWorks URL at request time — and Power Platform's MCP custom-connector path ignores additional `securityDefinitions` beyond the primary one (Basic Auth), so it cannot. The two visible workarounds (pin a single tenant via env var on the public Space, or stand up our own OAuth / DCR layer in front of the MCP) each forced an unwanted property — single-tenancy in the first case, full-public-internet AppWorks exposure in the second.
+
+**Approach** (see `DEC-016`): Stop trying to host a single shared MCP. Ship the MCP as a public container image (`ghcr.io/tlcfworks/process-automation-mcp`) and an ARM template + Deploy-to-Azure button under `deploy/azure/`. Each customer deploys their own Container App into their own Azure subscription, pins their AppWorks URL via env var, and customises the Power Platform connector under `deploy/copilot-studio/connector.yaml` to point at their app's FQDN. AppWorks never leaves the customer's network — the Container App egresses to it privately (VNet integration / Private Link / VPN) while Copilot Studio talks to the MCP over public HTTPS.
+
+**Shipped:**
+- `deploy/azure/Dockerfile` — multi-stage build from repo source; runtime image installs the freshly-built wheel as a non-root user, listens on `:7860` in HTTP transport mode (`PA_TRANSPORT=http`, `PA_HTTP_HOST=0.0.0.0`).
+- `deploy/azure/azuredeploy.json` — ARM template provisioning a Log Analytics workspace, Container Apps Environment, and Container App pulling the pinned image tag. Required parameter `paServiceUrl`; optional `paAuthMode`, `paLogLevel`, `imageTag`, `minReplicas`, `maxReplicas`. Outputs the deployed FQDN and the `/mcp` endpoint URL.
+- `deploy/azure/azuredeploy.parameters.json` — example parameters file customers copy and edit before deploying from the CLI.
+- `deploy/azure/README.md` — Deploy-to-Azure badge, prerequisites (Azure subscription, AppWorks reachability from Container Apps egress, required AppWorks role), post-deploy connector setup walkthrough.
+- `.github/workflows/publish-image.yml` — GitHub Action that builds and pushes to GHCR on tag (`v*`) and `main` pushes. Tags: full semver, `major.minor`, `latest` from `main`.
+- `deploy/copilot-studio/connector.yaml` — `host:` rewritten to a placeholder customers must replace; description rewritten for the customer-hosted model.
+- `README.md` — Deploy section now points at `deploy/azure/README.md` as the production path for hosted MCP clients (Copilot Studio).
+
+**Retired:**
+- `deploy/huggingface/` — the Space, its Dockerfile, HOWTO, and bundled wheel are gone. The corresponding `.gitignore` line is removed. Anyone who wants a public demo can `docker run ghcr.io/tlcfworks/process-automation-mcp:latest` locally or spin up a sandbox Container App from the same template.
+
+**Out of scope (deliberately deferred):**
+- OAuth 2.0 / OBO SSO via Entra ID ↔ OTDS federation — natural next step but depends on a customer environment with OTDS already federated to Entra. Tracked as a follow-up once such an environment is available to validate against.
+- A future v0.3 PyPI release that switches the Dockerfile from "build wheel from source" to `pip install opentext-pa-mcp>=0.3` — the multi-stage build already covers source builds, so this is bookkeeping rather than a blocker.
+
+**No `src/` changes** — this milestone is deployment artefacts and docs only. Existing v0.2.0 HTTP transport + per-request credentials code already supports the customer-hosted topology (single `PA_SERVICE_URL` default + Basic Auth header passthrough).
+
+---
+
+## 2026-05-15 (evening) — v0.2.0: HTTP transport + per-request credentials
+
+Users want to plug this MCP into Microsoft Copilot Studio and other hosted MCP clients that can only consume MCP servers over HTTPS (not by spawning a stdio subprocess). They also want each end-user's *own* AppWorks credentials to drive *their* requests, so AppWorks audit trails and per-user security-building-block enforcement remain intact. The v0.1.x design (one process per user, credentials from env vars at startup) was fundamentally incompatible with both of those requirements.
+
+**Approach** (see `DEC-015`): one repo, one package, new `PA_TRANSPORT=stdio|http` switch. Stdio is unchanged. In HTTP mode the server runs FastMCP's Streamable HTTP transport on `PA_HTTP_HOST:PA_HTTP_PORT` (defaults `127.0.0.1:8000`) and reads tenant credentials from each MCP request's headers — `Authorization: Basic <base64(user:pass)>`, `X-PA-Service-URL: <url>`, optional `X-PA-Auth-Mode: auto|otds|cordys`. A process-local in-memory `SessionCache` keyed on `(service_url, username)` reuses already-authenticated `AppworksClient`s and their warm catalogs across successive requests from the same user, so OTDS/Cordys login + OpenAPI discovery only run once per user per restart.
+
+**Shipped:**
+- `src/opentext_pa_mcp/config.py` — `transport`, `http_host`, `http_port` fields + parsers; in `http` mode the tenant fields (`service_url`, `username`, `password`) become **optional defaults** rather than required startup vars.
+- `src/opentext_pa_mcp/session_cache.py` — `Session` + `SessionCache` (asyncio-lock-protected, factory-injectable for tests, half-built sessions closed cleanly on discovery failure so retries don't leak clients).
+- `src/opentext_pa_mcp/request_config.py` — `build_request_config(headers, defaults)` merges Authorization / `X-PA-Service-URL` / `X-PA-Auth-Mode` headers with server defaults; all parse failures raise `AuthenticationError` for clean MCP-layer translation.
+- `src/opentext_pa_mcp/server.py` — split lifespan into `StdioAppContext` (existing single-session) and `HttpAppContext` (defaults + cache); new `_resolve_session(ctx)` returns the right `(catalog, client)` for the current request; tool wrappers collapsed onto a single `_dispatch` helper.
+- `src/opentext_pa_mcp/__main__.py` — honours `config.transport`, runs `server.run(transport="streamable-http", host=..., port=...)` when http.
+- `tests/unit/test_config.py` — 17 new tests under `TestTransport` covering parsing, validation, and the http-mode optional-tenant-fields branch.
+- `tests/unit/test_session_cache.py` — 9 new tests covering keying, concurrent first-time callers (single shared session via `asyncio.Lock`), close semantics, and discovery-failure isolation.
+- `tests/unit/test_request_config.py` — 21 new tests covering Basic-auth parsing, header → Config merge, service-URL precedence, auth-mode override, server-default fallbacks, and password redaction in `repr`.
+- `tests/unit/test_server_http_mode.py` — 6 new tests covering `_resolve_session` routing: stdio short-circuits (`get_http_headers` must not be called), http mode resolves per-request, same user reuses session, different users / different URLs get isolated sessions, missing auth raises cleanly.
+
+**Quality gates that held:**
+- `ruff check src tests` — clean.
+- `pyright src tests` — TBD final run before tagging.
+- 172 unit tests passing (previously 112; the 60 new ones cover the new module surface).
+- No regression in existing OTDS / Cordys auth paths — the strategy dispatcher is unchanged; per-request `Config` plugs in *above* it.
+
+**Out of scope (deliberately deferred to a later release):**
+- OAuth / Entra bearer-token mode — natural future addition once we see customer demand and confirm OTDS federation availability per deployment.
+- Distributed session cache (Redis / Memcached) — current cache is process-local and fine for single-replica deployments; multi-replica is not yet a stated need.
+- Cordys-specific deployment recipe under `docs/integrations/copilot-studio/` — the connector YAML and deployment screenshots will land in a follow-up doc PR.
+
+---
+
 ## 2026-05-15 (later) — Docs: required AppWorks role + folder reorganisation
 
 While investigating public-mirror issue #1 ("server doesn't start without Developer Role"), we walked the deployed `entityRestService` webapp and the embedded `entityCore.jar` and found the exact gate: `EntityRestResourceService.getAPI()` does an `isInRole("OpenText Entity Runtime#Entity REST API Developer")` check before serving `/api/{Service}/docs`. Per OpenText's own documentation the role only grants the API *channel* (URL access + Swagger doc visibility) — it does **not** bypass entity-level Security / Sharing building blocks. So granting it adds no real data exposure beyond what the user already has via their functional roles.

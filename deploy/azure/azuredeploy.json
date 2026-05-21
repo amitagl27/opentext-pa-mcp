@@ -1,0 +1,177 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Deploys the OpenText Process Automation MCP server as an Azure Container App, pulling the public image from ghcr.io/amitagl27/opentext-pa-mcp. Provisions a Log Analytics workspace, a Container Apps Environment, and the Container App itself. Outputs the MCP endpoint URL to point your Power Platform connector at."
+  },
+  "parameters": {
+    "appName": {
+      "type": "string",
+      "defaultValue": "process-automation-mcp",
+      "metadata": {
+        "description": "Name of the Container App. Becomes part of the public FQDN."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region. Defaults to the resource group's region."
+      }
+    },
+    "paServiceUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Full AppWorks entity-service URL, e.g. http://host:3381/home/<tenant>/app/entityservice/<EntityServiceName>. Must be reachable from the Container App's egress IP."
+      }
+    },
+    "paAuthMode": {
+      "type": "string",
+      "defaultValue": "auto",
+      "allowedValues": ["auto", "otds", "cordys"],
+      "metadata": {
+        "description": "AppWorks login strategy. 'auto' inspects the login page; override only if auto-detection misfires."
+      }
+    },
+    "paLogLevel": {
+      "type": "string",
+      "defaultValue": "INFO",
+      "allowedValues": ["DEBUG", "INFO", "WARNING", "ERROR"],
+      "metadata": {
+        "description": "Log level for the MCP server."
+      }
+    },
+    "imageTag": {
+      "type": "string",
+      "defaultValue": "latest",
+      "metadata": {
+        "description": "Tag of the ghcr.io/amitagl27/opentext-pa-mcp image to deploy. Pin to a specific version (e.g. 0.2.0) in production."
+      }
+    },
+    "minReplicas": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 0,
+      "maxValue": 10,
+      "metadata": {
+        "description": "Minimum replica count. Set to 0 for scale-to-zero (cheaper but cold-start latency hits the first request after idle). Default 1 avoids cold starts."
+      }
+    },
+    "maxReplicas": {
+      "type": "int",
+      "defaultValue": 3,
+      "minValue": 1,
+      "maxValue": 30,
+      "metadata": {
+        "description": "Maximum replica count under load."
+      }
+    },
+    "cpuCores": {
+      "type": "string",
+      "defaultValue": "0.5",
+      "metadata": {
+        "description": "vCPU per replica. 0.5 is the cheapest viable size."
+      }
+    },
+    "memorySize": {
+      "type": "string",
+      "defaultValue": "1Gi",
+      "metadata": {
+        "description": "Memory per replica. Pair with cpuCores per Container Apps' allowed ratios."
+      }
+    }
+  },
+  "variables": {
+    "logAnalyticsName": "[concat(parameters('appName'), '-logs')]",
+    "environmentName": "[concat(parameters('appName'), '-env')]",
+    "image": "[concat('ghcr.io/amitagl27/opentext-pa-mcp:', parameters('imageTag'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[variables('logAnalyticsName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": { "name": "PerGB2018" },
+        "retentionInDays": 30,
+        "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": true
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2024-03-01",
+      "name": "[variables('environmentName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+      ],
+      "properties": {
+        "appLogsConfiguration": {
+          "destination": "log-analytics",
+          "logAnalyticsConfiguration": {
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName')), '2022-10-01').customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName')), '2022-10-01').primarySharedKey]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2024-03-01",
+      "name": "[parameters('appName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', variables('environmentName'))]"
+      ],
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', variables('environmentName'))]",
+        "configuration": {
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": true,
+            "targetPort": 7860,
+            "transport": "auto",
+            "allowInsecure": false,
+            "traffic": [
+              { "latestRevision": true, "weight": 100 }
+            ]
+          }
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "mcp",
+              "image": "[variables('image')]",
+              "env": [
+                { "name": "PA_SERVICE_URL", "value": "[parameters('paServiceUrl')]" },
+                { "name": "PA_AUTH_MODE", "value": "[parameters('paAuthMode')]" },
+                { "name": "PA_LOG_LEVEL", "value": "[parameters('paLogLevel')]" }
+              ],
+              "resources": {
+                "cpu": "[json(parameters('cpuCores'))]",
+                "memory": "[parameters('memorySize')]"
+              }
+            }
+          ],
+          "scale": {
+            "minReplicas": "[parameters('minReplicas')]",
+            "maxReplicas": "[parameters('maxReplicas')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "fqdn": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.App/containerApps', parameters('appName')), '2024-03-01').configuration.ingress.fqdn]"
+    },
+    "mcpEndpoint": {
+      "type": "string",
+      "value": "[concat('https://', reference(resourceId('Microsoft.App/containerApps', parameters('appName')), '2024-03-01').configuration.ingress.fqdn, '/mcp')]"
+    }
+  }
+}

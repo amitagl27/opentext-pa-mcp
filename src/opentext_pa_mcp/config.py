@@ -27,9 +27,15 @@ ENV_ALLOW_WRITES = "PA_ALLOW_WRITES"
 ENV_VERIFY_TLS = "PA_VERIFY_TLS"
 ENV_CA_BUNDLE = "PA_CA_BUNDLE"
 ENV_AUTH_MODE = "PA_AUTH_MODE"
+ENV_TRANSPORT = "PA_TRANSPORT"
+ENV_HTTP_HOST = "PA_HTTP_HOST"
+ENV_HTTP_PORT = "PA_HTTP_PORT"
 
 AuthMode = Literal["auto", "otds", "cordys"]
 _VALID_AUTH_MODES: frozenset[str] = frozenset({"auto", "otds", "cordys"})
+
+Transport = Literal["stdio", "http"]
+_VALID_TRANSPORTS: frozenset[str] = frozenset({"stdio", "http"})
 
 
 @dataclass(frozen=True)
@@ -76,6 +82,20 @@ class Config:
     Automation CE 25.x). Override with ``otds`` or ``cordys`` only if auto-detection
     misfires. See DEC-014."""
 
+    transport: Transport = "stdio"
+    """Which MCP transport to expose the server on. ``stdio`` (default) is the
+    process-per-client transport used by Claude Desktop / Claude Code. ``http``
+    runs a long-lived Streamable HTTP server that accepts per-request credentials
+    via HTTP headers — required for hosted deployments (Copilot Studio, public
+    URLs). See DEC-015."""
+
+    http_host: str = "127.0.0.1"
+    """Bind address when ``transport='http'``. Defaults to loopback; set to
+    ``0.0.0.0`` to accept connections from other hosts."""
+
+    http_port: int = 8000
+    """Listen port when ``transport='http'``."""
+
     def __repr__(self) -> str:
         # Custom repr keeps the password out of any log lines or crash dumps.
         return (
@@ -98,23 +118,48 @@ class Config:
 def load_config(env: dict[str, str] | None = None) -> Config:
     """Build a :class:`Config` from the process environment (or an injected dict for tests).
 
+    Behaviour branches on :data:`PA_TRANSPORT`:
+
+    - ``stdio`` (default) — tenant fields (``PA_SERVICE_URL``, ``PA_USERNAME``,
+      ``PA_PASSWORD``) are **required**, matching the original single-user-per-process
+      contract from v0.1.x.
+    - ``http`` — tenant fields are **optional defaults**; credentials normally arrive
+      on each MCP request via HTTP headers (see :func:`build_request_config`). Setting
+      them at the server level is still allowed for single-tenant hosted deployments.
+
     Raises:
         ConfigurationError: if any required variable is missing or any value is malformed.
     """
     env = env if env is not None else dict(os.environ)
 
-    service_url = _require(env, ENV_SERVICE_URL).rstrip("/")
-    username = _require(env, ENV_USERNAME)
-    password = _require(env, ENV_PASSWORD)
+    transport = _parse_transport(env.get(ENV_TRANSPORT))
 
-    host, tenant, service_name = _split_service_url(service_url)
-    api_base = f"{host}/home/{tenant}/app/entityRestService/api"
+    if transport == "stdio":
+        service_url = _require(env, ENV_SERVICE_URL).rstrip("/")
+        username = _require(env, ENV_USERNAME)
+        password = _require(env, ENV_PASSWORD)
+        host, tenant, service_name = _split_service_url(service_url)
+        api_base = f"{host}/home/{tenant}/app/entityRestService/api"
+        entity_service_url = service_url
+    else:
+        (
+            service_url,
+            username,
+            password,
+            host,
+            tenant,
+            service_name,
+            api_base,
+            entity_service_url,
+        ) = _parse_optional_tenant_fields(env)
 
     log_level = _parse_log_level(env.get(ENV_LOG_LEVEL))
     timeout = _parse_timeout(env.get(ENV_REQUEST_TIMEOUT_S))
     allow_writes = _parse_bool(env.get(ENV_ALLOW_WRITES), default=False)
     verify_tls, ca_bundle = _parse_tls_settings(env.get(ENV_VERIFY_TLS), env.get(ENV_CA_BUNDLE))
     auth_mode = _parse_auth_mode(env.get(ENV_AUTH_MODE))
+    http_host = _parse_http_host(env.get(ENV_HTTP_HOST))
+    http_port = _parse_http_port(env.get(ENV_HTTP_PORT))
 
     return Config(
         service_url=service_url,
@@ -124,14 +169,38 @@ def load_config(env: dict[str, str] | None = None) -> Config:
         tenant=tenant,
         service_name=service_name,
         api_base=api_base,
-        entity_service_url=service_url,
+        entity_service_url=entity_service_url,
         log_level=log_level,
         request_timeout_s=timeout,
         allow_writes=allow_writes,
         verify_tls=verify_tls,
         ca_bundle=ca_bundle,
         auth_mode=auth_mode,
+        transport=transport,
+        http_host=http_host,
+        http_port=http_port,
     )
+
+
+def _parse_optional_tenant_fields(
+    env: dict[str, str],
+) -> tuple[str, str, str, str, str, str, str, str]:
+    """Parse PA_SERVICE_URL/USERNAME/PASSWORD as **optional** defaults (http mode).
+
+    Returns ``(service_url, username, password, host, tenant, service_name, api_base,
+    entity_service_url)``. All eight strings are populated when ``PA_SERVICE_URL`` is
+    provided; otherwise the URL-derived fields are empty strings to signal "no default —
+    a request must supply this via headers".
+    """
+    raw_url = (env.get(ENV_SERVICE_URL) or "").strip().rstrip("/")
+    username = (env.get(ENV_USERNAME) or "").strip()
+    # Don't strip the password: leading/trailing whitespace is legitimate.
+    password = env.get(ENV_PASSWORD) or ""
+    if not raw_url:
+        return ("", username, password, "", "", "", "", "")
+    host, tenant, service_name = _split_service_url(raw_url)
+    api_base = f"{host}/home/{tenant}/app/entityRestService/api"
+    return (raw_url, username, password, host, tenant, service_name, api_base, raw_url)
 
 
 def _require(env: dict[str, str], name: str) -> str:
@@ -247,3 +316,43 @@ def _parse_auth_mode(raw: str | None) -> AuthMode:
             f"Leave unset to auto-detect."
         )
     return value  # type: ignore[return-value]
+
+
+def _parse_transport(raw: str | None) -> Transport:
+    """Validate and normalise ``PA_TRANSPORT`` to ``stdio`` | ``http``."""
+    if raw is None:
+        return "stdio"
+    value = raw.strip().lower()
+    if value not in _VALID_TRANSPORTS:
+        raise ConfigurationError(
+            f"{ENV_TRANSPORT}={raw!r} is not valid. "
+            f"Expected one of: stdio, http (case-insensitive). "
+            f"Leave unset for the default (stdio)."
+        )
+    return value  # type: ignore[return-value]
+
+
+def _parse_http_host(raw: str | None) -> str:
+    """Return the bind host for http transport. Defaults to loopback."""
+    if raw is None:
+        return "127.0.0.1"
+    stripped = raw.strip()
+    return stripped or "127.0.0.1"
+
+
+def _parse_http_port(raw: str | None) -> int:
+    """Parse the listen port for http transport. Defaults to 8000.
+
+    Raises:
+        ConfigurationError: if not a positive integer in the valid TCP range.
+    """
+    if raw is None:
+        return 8000
+    stripped = raw.strip()
+    try:
+        port = int(stripped)
+    except ValueError as exc:
+        raise ConfigurationError(f"{ENV_HTTP_PORT}={raw!r} is not an integer.") from exc
+    if port <= 0 or port > 65535:
+        raise ConfigurationError(f"{ENV_HTTP_PORT}={port} is out of range. Expected 1-65535.")
+    return port

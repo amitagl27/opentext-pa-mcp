@@ -12,9 +12,9 @@ The server discovers the entire API surface (typically several hundred endpoints
 
 ## Status
 
-**v0.1.3 — read-only release, live on PyPI.** Install with `pip` and configure your MCP client.
+**v0.2.0 — read-only release, live on PyPI.** Install with `pip` and configure your MCP client.
 
-Works against both OTDS-fronted AppWorks 23.x and Cordys-built-in Process Automation CE 25.x; the right login flow is picked automatically. See `docs/research/findings.md` for the validated design and what we learned from probing live instances.
+Works against both OTDS-fronted AppWorks 23.x and Cordys-built-in Process Automation CE 25.x; the right login flow is picked automatically. Ships **two transports** out of the box — `stdio` (the default, for Claude Desktop / Code / Cursor / Cline / any local MCP client) and `http` (Streamable HTTP for hosted clients like Microsoft Copilot Studio). See [Deployment modes](#deployment-modes) below and `docs/research/findings.md` for the validated design.
 
 ## Install
 
@@ -65,6 +65,9 @@ Optional env vars:
 | `PA_VERIFY_TLS` | `true` | Set to `false` to skip TLS certificate verification. **Insecure** — use only against dev/test servers with self-signed certs. |
 | `PA_CA_BUNDLE` | *(unset)* | Path to a PEM file containing your corporate root CA. Use this when AppWorks is on `https://` behind an internal CA. Preferred over disabling verification. Mutually exclusive with `PA_VERIFY_TLS=false`. |
 | `PA_AUTH_MODE` | `auto` | Login strategy. `auto` (default) inspects the login page and picks `otds` (AppWorks 23.x, OTDS-fronted) or `cordys` (Process Automation CE 25.x, Cordys built-in SSO). Set explicitly to `otds` or `cordys` only if auto-detection misfires. |
+| `PA_TRANSPORT` | `stdio` | `stdio` (default) for Claude Desktop / Code / Cursor; `http` for hosted MCP clients (Copilot Studio, web agents). See [Deployment modes](#deployment-modes). |
+| `PA_HTTP_HOST` | `127.0.0.1` | Only used when `PA_TRANSPORT=http`. Bind address; set to `0.0.0.0` to accept remote connections. |
+| `PA_HTTP_PORT` | `8000` | Only used when `PA_TRANSPORT=http`. |
 
 The `PA_SERVICE_URL` is **the exact URL you see in your browser** when looking at the Swagger UI of the entity service you want to expose. The server parses host, tenant, and service name out of it.
 
@@ -97,6 +100,48 @@ Practical guidance for admins:
 - No other "Developer Role" / "Administrator" assignment is needed for the MCP server to work.
 - After granting the role, restart the MCP server — startup discovery will succeed and the catalog will reflect only the entities the user already has functional access to.
 
+## Deployment modes
+
+Pick a transport based on who calls the server:
+
+### `stdio` (default) — Claude Desktop / Code / Cursor / Cline / any local MCP client
+
+This is what the **Install** and **Configure your MCP client** sections above describe. One process per end-user, credentials supplied as env vars in the client's JSON config. Nothing else to set; `PA_TRANSPORT` does not need to appear.
+
+### `http` — Microsoft Copilot Studio, web agents, hosted clients
+
+When the client cannot spawn a local subprocess (Copilot Studio, custom web agents, internal portals), run the server as a long-lived HTTP service. Credentials come in **on each MCP request** as HTTP headers instead of from env vars, so every end-user authenticates with their *own* AppWorks identity (audit trails and security-building-block permissions stay user-scoped).
+
+**For production deployments, use the Azure Container Apps recipe at [`deploy/azure/README.md`](deploy/azure/README.md)** — it ships an ARM template + Deploy-to-Azure button, pulls the prebuilt image from `ghcr.io/amitagl27/opentext-pa-mcp`, and includes the Power Platform connector setup walkthrough. The instructions below are for running the HTTP server directly (development, custom hosting).
+
+Start the server in http mode:
+
+```powershell
+$env:PA_TRANSPORT = "http"
+$env:PA_HTTP_HOST = "0.0.0.0"     # bind to all interfaces; omit for loopback only
+$env:PA_HTTP_PORT = "8000"
+python -m opentext_pa_mcp
+```
+
+The server logs `Starting opentext-pa-mcp (http) on 0.0.0.0:8000. Credentials expected per-request.` and stays running. It is now reachable over Streamable HTTP at `http://<host>:8000/mcp/`.
+
+Every inbound MCP request must include the following headers:
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization: Basic <base64(username:password)>` | yes | The user's AppWorks credentials. Same credentials they would type into the OTDS / Cordys login page. |
+| `X-PA-Service-URL: <full entity-service URL>` | yes* | The exact URL you would see in the AppWorks Swagger UI of the entity service you want to query. \*Optional if `PA_SERVICE_URL` is set on the server as a single-tenant default. |
+| `X-PA-Auth-Mode: auto \| otds \| cordys` | no | Overrides the auto-detected login strategy. Use only if auto-detection misfires behind a custom proxy. |
+
+The server keeps one warm `AppworksClient` + OpenAPI catalog **per `(service_url, username)` pair** in memory, so repeat calls from the same user don't re-run OTDS / Cordys login on every request. The cache is process-local and is cleared on restart.
+
+**Authorization failures** (missing header, malformed credentials, invalid service URL) come back as a structured `"AuthenticationError"` reply on the MCP channel — clients should treat them like any other tool-level error.
+
+**Security notes:**
+- Always front the HTTP server with TLS in production (a reverse proxy, an API gateway, or Cloud Run's built-in HTTPS). The server itself speaks plain HTTP; certificate termination is up to your hosting layer.
+- The server has **no internal authentication** beyond forwarding credentials to AppWorks. Anyone who can reach the listener can attempt a login. Restrict access at the network layer (firewall, private VPC, authenticated reverse proxy) or in front of the connector.
+- AppWorks itself enforces all per-entity authorisation via its Security and Sharing building blocks — the MCP is not a security boundary, just a translation layer.
+
 ## Try it
 
 After restarting Claude Desktop, ask things like:
@@ -123,6 +168,9 @@ opentext-processautomation-mcp/
 ├── CONTRIBUTING.md     Branching, PRs, commit conventions
 ├── README.md           This file
 ├── pyproject.toml      Package manifest, dependencies, tool config
+├── deploy/
+│   ├── azure/          Azure Container Apps deployment (ARM template, Dockerfile, README)
+│   └── copilot-studio/ Power Platform custom connector (Swagger 2.0 YAML)
 ├── docs/
 │   ├── DECISIONS.md    Architectural decisions (DEC-NNN entries)
 │   ├── CHANGELOG.md    Narrative product evolution log

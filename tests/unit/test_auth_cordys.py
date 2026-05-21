@@ -31,9 +31,7 @@ ENTITY_SERVICE_URL = f"{HOST}/home/{TENANT}/app/entityservice/{SERVICE_NAME}"
 API_BASE = f"{HOST}/home/{TENANT}/app/entityRestService/api"
 LOGIN_PAGE_URL = f"{HOST}/home/{TENANT}/wcp/sso/login.htm"
 GATEWAY_URL = f"{HOST}/home/{TENANT}/com.eibus.web.soap.Gateway.wcp"
-TOKEN_URL = (
-    f"{HOST}/home/{TENANT}/wcp/sso/com.eibus.sso.web.authentication.AuthenticationToken.wcp"
-)
+TOKEN_URL = f"{HOST}/home/{TENANT}/wcp/sso/com.eibus.sso.web.authentication.AuthenticationToken.wcp"
 
 # Cookies the server sets after the AuthenticationToken.wcp step. Cookie name prefix
 # is the tenant name lowercased + "inst".
@@ -180,9 +178,7 @@ class TestEndToEndCordysLogin:
 
         # In forced 'cordys' mode the strategy does not need to fetch the login.htm.
         # We only assert the SOAP gateway was hit (detection is optional in this mode).
-        gateway_posts = [
-            c for c in respx.mock.calls if str(c.request.url) == GATEWAY_URL
-        ]
+        gateway_posts = [c for c in respx.mock.calls if str(c.request.url) == GATEWAY_URL]
         assert len(gateway_posts) >= 1
 
     @respx.mock

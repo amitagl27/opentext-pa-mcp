@@ -1,0 +1,90 @@
+swagger: '2.0'
+info:
+  title: OpenText Process Automation MCP
+  description: >
+    Talk to an OpenText AppWorks Process Automation tenant in plain English.
+    This connector targets your own deployment of the opentext-pa-mcp server
+    (typically an Azure Container App running the public image
+    ghcr.io/amitagl27/opentext-pa-mcp; see deploy/azure/README.md in
+    this repo). The MCP server exposes ~9 generic tools (list_entities,
+    describe_entity, query_list, get_entity, list_children, get_child,
+    list_relationship_targets, list_named_lists, pa_api_call) over the
+    AppWorks entity service the deployment is configured for (PA_SERVICE_URL
+    environment variable on the Container App). Each user signs in with
+    their own AppWorks credentials and AppWorks enforces entity-level
+    Security and Sharing building blocks against that identity.
+
+    Before importing into Power Platform, replace the host: field below
+    with your Container App's FQDN (visible in the Azure portal after
+    deployment, or in the ARM template's `fqdn` output).
+  version: '1.0.0'
+  contact:
+    name: opentext-pa-mcp
+    url: https://github.com/amitagl27/opentext-pa-mcp
+
+# Replace this placeholder with your Container App's FQDN before importing.
+# It will look like:  process-automation-mcp.<region-id>.azurecontainerapps.io
+# (no scheme, no path).
+host: REPLACE-WITH-YOUR-CONTAINER-APP-FQDN.azurecontainerapps.io
+basePath: /
+schemes:
+  - https
+
+consumes:
+  - application/json
+produces:
+  - application/json
+  - text/event-stream
+
+securityDefinitions:
+  basic_auth:
+    type: basic
+    description: >
+      Your AppWorks username and password. Used to log into the configured
+      entity-service URL via OTDS (AppWorks 23.x) or Cordys (AppWorks 25.x).
+
+security:
+  - basic_auth: []
+
+paths:
+  /mcp:
+    post:
+      summary: Invoke the OpenText PA MCP server
+      description: >
+        Streamable HTTP MCP entry point. Power Platform handles the MCP
+        protocol exchange — agents discover and call the underlying tools
+        (list_entities, query_list, …) directly through this single operation.
+      operationId: InvokeMCP
+      x-ms-agentic-protocol: mcp-streamable-1.0
+      x-ms-visibility: important
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          type: string
+          default: 'application/json, text/event-stream'
+          description: >
+            Required by the MCP Streamable HTTP protocol — the server only
+            replies if the client signals it can accept both JSON and SSE.
+            Power Platform sends this automatically using the default value;
+            users do not see it.
+          x-ms-visibility: internal
+        - name: Content-Type
+          in: header
+          required: true
+          type: string
+          default: application/json
+          description: MCP request body is JSON-RPC. Hidden, set automatically.
+          x-ms-visibility: internal
+      responses:
+        '200':
+          description: MCP response (JSON or text/event-stream stream).
+        '401':
+          description: AppWorks rejected the supplied credentials.
+        '400':
+          description: Missing or malformed MCP request headers.
+
+definitions: {}
+parameters: {}
+responses: {}
+tags: []

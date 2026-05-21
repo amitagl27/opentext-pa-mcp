@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": {
+      "value": "process-automation-mcp"
+    },
+    "paServiceUrl": {
+      "value": "http://your-appworks-host:3381/home/<tenant>/app/entityservice/<EntityServiceName>"
+    },
+    "paAuthMode": {
+      "value": "auto"
+    },
+    "paLogLevel": {
+      "value": "INFO"
+    },
+    "imageTag": {
+      "value": "latest"
+    },
+    "minReplicas": {
+      "value": 1
+    },
+    "maxReplicas": {
+      "value": 3
+    },
+    "cpuCores": {
+      "value": "0.5"
+    },
+    "memorySize": {
+      "value": "1Gi"
+    }
+  }
+}

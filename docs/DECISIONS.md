@@ -172,6 +172,58 @@ A `Config.httpx_verify()` helper produces the value to pass to `httpx.AsyncClien
 
 ---
 
+## DEC-015 — HTTP transport + per-request credentials for hosted deployments
+
+**Date:** 2026-05-15
+**Decision:** Add a Streamable HTTP transport behind a new `PA_TRANSPORT=stdio|http` env var (default `stdio`). In HTTP mode the server does **not** read tenant credentials from environment variables at startup; instead each MCP request carries them as HTTP headers:
+
+- `Authorization: Basic <base64(username:password)>` — required.
+- `X-PA-Service-URL: <full entity-service URL>` — required (or pre-set via `PA_SERVICE_URL` for single-tenant deployments).
+- `X-PA-Auth-Mode: auto|otds|cordys` — optional, overrides `PA_AUTH_MODE`.
+
+A process-local in-memory `SessionCache` keyed on `(service_url, username)` reuses warm `AppworksClient` instances (and their already-discovered `EntityCatalog`) across successive requests from the same user. Two new env vars `PA_HTTP_HOST` (default `127.0.0.1`) and `PA_HTTP_PORT` (default `8000`) bind the HTTP listener. Stdio mode is unchanged — the v0.1.x install story for Claude Desktop / Claude Code continues to work as documented.
+
+**Context:** Users (issue tracked outside the repo) want to plug this MCP into hosted clients — Microsoft Copilot Studio, custom web agents, internal portals — that can only consume MCP servers over HTTP, not by spawning a subprocess over stdio. They also want each end-user's *own* AppWorks credentials to authorise *their* requests, so audit trails, permissions, and security building-block enforcement at AppWorks remain user-scoped (not service-account-scoped). The original `PA_USERNAME` / `PA_PASSWORD` env-var model assumed one process per user — fundamentally incompatible with a long-lived hosted server.
+
+**Alternatives considered:**
+- **Fork into a separate `opentext-processautomation-mcp-copilot` repo** — rejected: ~95 % of the code (discovery, catalog, OTDS + Cordys auth strategies, tools, error model, TLS handling) is identical across the two flavours. Maintaining two repos doubles patch surface for every bug fix (the Cordys auth fix shipped in v0.1.3 would have to land twice) and creates documentation / version confusion. Industry pattern in the wider MCP ecosystem (GitHub MCP, Pulumi MCP, Notion MCP, the Anthropic-maintained `modelcontextprotocol/servers`) is one repo with transport selected at runtime.
+- **OAuth 2.0 / OIDC bearer tokens via Entra ID** — rejected for v1: only works when OTDS is configured as a SAML/OIDC federation endpoint with Entra (a deployment-specific config the user may not control). Many AppWorks 23.x customers only have OTDS form-login with Entra-synced *passwords*, not federated identity. Bearer mode is a natural future addition once the per-request auth pathway exists.
+- **Per-tool-call credential arguments** — rejected: leaks credentials into the LLM's conversation history and tool-call traces; pollutes every tool signature.
+- **Distributed session cache (Redis / Memcached)** — rejected for v1: overkill for the single-process deployment model; sessions are cheap to rebuild on restart (one OTDS or SAML login + one OpenAPI discovery, ~1-2 s). Can be added later behind an abstraction if multi-replica deployments emerge.
+- **Bind to `0.0.0.0` by default** — rejected: surprising default for a server that previously only ran on a user's laptop. `127.0.0.1` is the safer default; deployment hosts override with `PA_HTTP_HOST=0.0.0.0` explicitly.
+
+**Rationale:** A single env-var switch (`PA_TRANSPORT`) keeps the v0.1.x stdio experience pristine while unlocking hosted deployments without forking. Per-request HTTP Basic auth is the lowest-common-denominator scheme — works with any MCP client that supports Power Platform custom connectors / generic HTTP MCP clients, and lines up directly with the same OTDS + Cordys credentials AppWorks already accepts (no new auth surface in AppWorks itself). The session cache makes repeat requests cheap (one OTDS login per user per service instead of per call). Failure responses on the auth path raise `AuthenticationError`, which the tool-layer error translator already maps to a structured response — clients get a clean `"AuthenticationError"` reply rather than an HTTP 500. Reference: `src/opentext_pa_mcp/{config,session_cache,request_config,server}.py`, `tests/unit/test_{config,session_cache,request_config,server_http_mode}.py`.
+
+---
+
+## DEC-016 — Deployment: customer-hosted Azure Container Apps as the primary target
+
+**Date:** 2026-05-16
+**Decision:** Distribute the HTTP-mode MCP server as a public OCI image at `ghcr.io/tlcfworks/process-automation-mcp` and ship an ARM template + Deploy-to-Azure button under `deploy/azure/`. Each customer deploys their own instance into their own Azure subscription, pins their AppWorks tenant via the `PA_SERVICE_URL` env var on the Container App, and imports the Power Platform custom connector under `deploy/copilot-studio/connector.yaml` after replacing the `host:` line with their app's FQDN. The previously-used Hugging Face Space (`deploy/huggingface/`) is retired in the same change.
+**Context:** Hosting a single shared MCP server on a public platform (HF Space) forced the network chain `user (corp VPN) → Copilot Studio (corp cloud) → MCP (public internet) → OTDS/AppWorks (?)` to traverse the public internet purely because of where the MCP lived. Pinning the AppWorks URL via env var on the public host worked technically but ruled out multi-tenancy. Power Platform's MCP custom-connector path also ignores additional `securityDefinitions` beyond the primary scheme (Basic Auth), so it cannot pass a per-tenant URL header from Copilot Studio. The combination forced a choice: either build a multi-tenant SaaS with its own auth (large project), or move hosting into each customer's own network.
+**Alternatives considered:**
+- Stay on the public HF Space, pin a single tenant — rejected: violates the multi-tenant requirement and forces the customer's AppWorks onto the public internet.
+- Stand up an OAuth 2.0 / Dynamic Client Registration layer in front of the public MCP — rejected: still leaves the AppWorks ↔ MCP hop crossing the public internet, doesn't solve the topology problem, and requires OTDS-to-Entra federation that many customers don't have. Worth revisiting in a later decision once SSO is the focus.
+- Power Platform On-Premises Data Gateway — rejected as the primary path: adds an opaque proprietary hop, requires a gateway machine on-prem, and only helps customers fully invested in Power Platform's gateway model. Still viable as a documented fallback for customers who can't use Azure.
+- Customer builds their own container infra from the published Docker image, without Azure templates — rejected as primary: viable for cloud-savvy customers but high-touch for everyone else. The published image (`ghcr.io/tlcfworks/process-automation-mcp`) supports this path; the ARM template just makes it one click.
+**Rationale:** Customer-hosted Azure Container Apps collapses the network chain to a single VNet — the MCP can reach on-prem AppWorks privately (Private Link / VPN / ExpressRoute), Copilot Studio talks to the MCP over public HTTPS, and AppWorks itself never leaves the customer's perimeter. Single-tenant per deployment matches the existing `PA_SERVICE_URL` model exactly; no `src/` code changes needed for this pivot. Distribution via a Deploy-to-Azure button + ARM template is a well-understood pattern that costs the customer near-zero on the Container Apps consumption plan and costs us nothing to publish. SSO via OAuth/OBO is naturally additive on top of this topology — defer to a follow-up decision when a customer environment with OTDS federated to Entra is available to validate against.
+
+**Update (2026-05-21):** the published image namespace moved from `ghcr.io/tlcfworks/process-automation-mcp` to `ghcr.io/amitagl27/opentext-pa-mcp` — see DEC-017.
+
+---
+
+## DEC-017 — Container image published under the public-mirror account (amitagl27)
+
+**Date:** 2026-05-21
+**Decision:** Publish the OCI image to `ghcr.io/amitagl27/opentext-pa-mcp` (the public-mirror account) instead of `ghcr.io/tlcfworks/process-automation-mcp`. `publish-image.yml` still runs in the private `tlcfworks` repo, but logs in to GHCR with the `amitagl27` PAT (`DESTINATION_REPO_PAT` — the same secret `sync-public.yml` already uses) so the package lands under the public account. `azuredeploy.json` and every deploy doc reference the new path.
+**Context:** The Deploy-to-Azure button and the whole public deployment story live in the public repo `amitagl27/opentext-pa-mcp`. An image namespaced under `tlcfworks` — a private account external users never see — on a public repo's one-click button is confusing and leaves the public repo not self-contained. The image belongs under the same account as the public repo.
+**Alternatives considered:**
+- Keep the image at `ghcr.io/tlcfworks/process-automation-mcp` — rejected: works, but leaves a private-account namespace on public-facing artifacts.
+- Add a second `publish-image.yml` to the public repo so its own `GITHUB_TOKEN` builds the image — rejected: the public repo's `.github/` is hand-maintained (the sync strips it), so this splits image-build config across two repos. Cross-pushing from the single workflow in `tlcfworks` keeps it single-sourced and version-controlled.
+**Rationale:** Reuses the existing `DESTINATION_REPO_PAT`, keeps all CI config in `tlcfworks/DEV`, and makes the public repo's deploy button reference an image in its own account. Requires that PAT to carry the `write:packages` scope. Supersedes the registry choice in DEC-016.
+
+---
+
 ## DEC-009 — v1.0 scope: read-only
 
 **Date:** 2026-05-12

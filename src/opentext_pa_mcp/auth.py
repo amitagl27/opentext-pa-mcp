@@ -285,9 +285,7 @@ class AppworksClient:
         fault_match = _SOAP_FAULTSTRING_PATTERN.search(body)
         if fault_match:
             message = fault_match.group(1).strip()
-            raise AuthenticationError(
-                f"Cordys SSO rejected the supplied credentials: {message}"
-            )
+            raise AuthenticationError(f"Cordys SSO rejected the supplied credentials: {message}")
 
         # Success: extract the assertion artifact.
         artifact_match = _SAML_ARTIFACT_PATTERN.search(body)
