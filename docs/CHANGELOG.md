@@ -4,6 +4,12 @@ Narrative log of how the project reached its current state. New entries at the t
 
 ---
 
+## 2026-05-21 (later) — v0.2.1: README links to the Copilot deployment guide
+
+Patch release. The root `README.md` hosted-deployment section now links to `docs/azure-copilot-deployment-guide.md`, so anyone connecting the server to Microsoft Copilot or Teams lands on the end-to-end walkthrough directly. No `src/` changes. This release also deliberately exercises the full delivery path — feature branch → PR to DEV → PR to main → public-repo sync → automatic PyPI publish — to validate the CI/CD chain.
+
+---
+
 ## 2026-05-21 — v0.2.0 public release: container image moves to the public account
 
 The Azure Container Apps deployment path is promoted to `main` and the public mirror. It was verified end-to-end first: a one-click deployment was exercised from the SIT branch, and a Microsoft Copilot Studio agent successfully queried live `PolicyIntimation` records through the deployed MCP server against a real AppWorks tenant.

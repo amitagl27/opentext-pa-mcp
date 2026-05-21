@@ -114,6 +114,8 @@ When the client cannot spawn a local subprocess (Copilot Studio, custom web agen
 
 **For production deployments, use the Azure Container Apps recipe at [`deploy/azure/README.md`](deploy/azure/README.md)** — it ships an ARM template + Deploy-to-Azure button, pulls the prebuilt image from `ghcr.io/amitagl27/opentext-pa-mcp`, and includes the Power Platform connector setup walkthrough. The instructions below are for running the HTTP server directly (development, custom hosting).
 
+> 📘 **Wiring this up to Microsoft Copilot or Teams?** Follow the end-to-end [Azure & Copilot agent deployment guide](docs/azure-copilot-deployment-guide.md) — one-click Azure deploy, the Power Platform custom connector, Copilot agent creation, testing, and troubleshooting.
+
 Start the server in http mode:
 
 ```powershell
