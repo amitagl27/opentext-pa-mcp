@@ -4,6 +4,31 @@ Narrative log of how the project reached its current state. New entries at the t
 
 ---
 
+## 2026-05-25 (later) — v0.3.0: auto-resolve business ids; translate Cordys BigInteger errors
+
+Driven by a Copilot Studio failure on the deployed Container App: a customer pasted a `PolicyIntimation` request id (`PI2526-000102`) into chat, the LLM called `get_entity(entity='PolicyIntimation', item_id='PI2526-000102')`, and the AppWorks API returned `EXPRESSION_PARSE_BIGINTEGER_ERROR` (HTTP 500) because `/items/{id}` only accepts the internal BigInteger primary key visible inside `_links.item.href`. Claude on the same workload recovered by falling back to `query_list(search=...)`; Copilot did not and surfaced "technical error" to the end user.
+
+**Decision in scope:** DEC-018 — the MCP encodes *platform invariants*, never per-entity semantics. The dual-id pain is a platform invariant (every entity has the same BigInteger PK / `_links.item.href` shape and the same DefaultList convention), so a single generic fix scales without naming entities, fields, or tenants.
+
+**Changed (`src/opentext_pa_mcp/tools/handlers.py`):**
+- New `_resolve_item_id(catalog, client, entity, item_id)` helper. Pass-through for all-digit ids. Otherwise GETs `/{entity}/lists/DefaultList?$search=<item_id>`, looks for items whose string `Properties.*` values equal the input exactly (case-insensitive), and extracts the internal int from `_links.item.href`. Single match wins; zero or many → structured error with the candidates so the LLM can re-query.
+- `get_entity`, `list_children`, `get_child`, `list_relationship_targets` now route their `item_id` (and `child_id`) through the resolver. The raw `pa_api_call` escape hatch is deliberately untouched.
+
+**Changed (`src/opentext_pa_mcp/auth.py`, `src/opentext_pa_mcp/errors.py`):**
+- New `InvalidItemIdError` (subclass of `HttpError`) and `ItemIdResolutionError` (subclass of `AppworksError`).
+- `_raise_or_parse` detects the `EXPRESSION_PARSE_BIGINTEGER_ERROR` marker in error response bodies and raises `InvalidItemIdError` with an actionable message naming the offending id and pointing to `_links.item.href`. The detection is keyed on the Cordys error vocabulary, not on endpoint, so any future caller that bypasses auto-resolution still gets a useful response.
+
+**Changed (`src/opentext_pa_mcp/server.py`):**
+- Tool descriptions for `get_entity`, `list_children`, `get_child`, `list_relationship_targets` now name the dual-id convention and the auto-resolution behaviour.
+- Server `instructions` (both stdio + http transports) carry the convention up front, so even LLMs that never read the per-tool docs (some Copilot connectors) learn the rule once at session start.
+- `_dispatch` adds dedicated mappings for `InvalidItemIdError` → `{"kind": "invalid_item_id", "attempted_id": ..., ...}` and `ItemIdResolutionError` → `{"kind": "item_id_resolution_failed", "attempted_id": ..., "entity": ..., "candidates": [...]}`.
+
+**Tests (per Rule 0, written first):**
+- `tests/unit/test_id_resolver.py` — eight cases: digit pass-through, single-match resolution (exact Properties match wins), zero matches, ambiguous multi-match (error lists candidates), exact-vs-partial-match disambiguation, plus equivalent parent-id resolution for `list_children` and parent+child for `get_child`.
+- `tests/unit/test_error_translation.py` — three cases: the BigInteger marker remaps to `InvalidItemIdError`, the new class is still an `HttpError` (so existing catch-broadly callers keep working), and unrelated 500s are left as plain `HttpError` (the translator must not over-reach).
+
+---
+
 ## 2026-05-25 — v0.2.2: harden the API auth path + add response diagnostics
 
 Patch release driven by a real Copilot Studio failure against the hosted Container App. The Power Platform connector surfaced `Error calling tool 'query_list': Expecting value: line 1 column 1 (char 0)` after a few minutes of idle. Container logs confirmed the exception originated server-side in our `_raise_or_parse` → `resp.json()` path; the response body that triggered it was never captured. The most plausible cause — an AppWorks session-expiry redirect resolving to `200 + text/html` because `httpx` follows redirects — fit the timeline but was **not proven**. AppWorks session cookies in this tenant are valid for 24h, which weakens the idle-expiry story; the underlying trigger could also be a stale connection-pool entry, a transient backend error returning HTML with 200, or something on the network path between Azure Container Apps and the AppWorks instance.

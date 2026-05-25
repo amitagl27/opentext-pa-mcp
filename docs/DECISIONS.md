@@ -224,6 +224,19 @@ A process-local in-memory `SessionCache` keyed on `(service_url, username)` reus
 
 ---
 
+## DEC-018 — MCP encodes platform invariants, not entity-specific semantics
+
+**Date:** 2026-05-25
+**Decision:** When AppWorks behaviour bites the LLM — e.g. `/items/{id}` rejecting `PI2526-000102` with `EXPRESSION_PARSE_BIGINTEGER_ERROR` because the path expects the internal BigInteger primary key, not the human-readable business id — the fix lives in the MCP **only if it follows from a platform invariant** (a rule that holds for every entity on every tenant). Hard-coded per-entity / per-field / per-tenant logic stays out. Concretely, three things landed in this release: (1) a generic item-id resolver in `handlers.py` that passes through all-digit ids and otherwise searches DefaultList for an exact, case-insensitive Properties match before extracting the int from `_links.item.href`; (2) an HTTP-layer translator in `auth.py` that maps the `EXPRESSION_PARSE_BIGINTEGER_ERROR` marker to `InvalidItemIdError` with an actionable message; (3) tool descriptions + server `instructions` that name the dual-id convention so even less-capable LLMs (e.g. Copilot Studio) learn the rule once.
+**Context:** A real Copilot Studio session passed a customer's RequestID to `get_entity`, the server returned an opaque 500, and Copilot surfaced "technical error" to the end user. Claude on the same data was clever enough to fall back to `query_list($search=...)` and recover, but the workaround returns the list-view item, not the full entity detail. The dual-id trap is not specific to PolicyIntimation — every entity exposes the same BigInteger PK / `_links.item.href` shape, so the fix scales without naming entities.
+**Alternatives considered:**
+- Just improve the error message and rely on the LLM to retry. Rejected: protects Claude but leaves Copilot users stuck — many LLM clients don't perform multi-step recovery.
+- Hard-code per-entity "business id field" mappings (e.g. `PolicyIntimation → RequestID`). Rejected: doesn't scale across 700+ endpoints and breaks the moment a tenant adds a new entity; this is exactly the entity-specific logic this DEC rules out.
+- Add a new `resolve_item_id` tool. Rejected: pushes the dual-id trap onto the LLM instead of solving it; auto-resolution inside `get_entity` is a strictly better surface.
+**Rationale:** The MCP's job is to encode the rules of the *platform* (HAL shape, OpenAPI tag = entity, DefaultList convention, BigInteger PK invariant, Cordys error vocabulary) so every client benefits without per-tenant configuration. The line "if I'm writing `if entity_name == 'PolicyIntimation'` I've crossed the line" is now on record. Future platform-shaped gotchas (e.g. additional `EXPRESSION_PARSE_*` codes, new HAL shapes) extend the translator in one place and benefit every tool.
+
+---
+
 ## DEC-009 — v1.0 scope: read-only
 
 **Date:** 2026-05-12

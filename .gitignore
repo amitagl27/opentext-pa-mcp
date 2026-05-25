@@ -55,6 +55,10 @@ docs/research/artifacts/post-login-response.html
 # probes) lives under docs/fromcustomer/ and stays out of the public repo.
 docs/fromcustomer/
 
+# Captured logs / bug reports used in-session to drive a fix. Stays local;
+# these typically contain customer hostnames, IPs, and stack traces.
+docs/newissue/
+
 # OS
 Thumbs.db
 desktop.ini

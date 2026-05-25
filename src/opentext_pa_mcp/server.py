@@ -27,7 +27,13 @@ from .auth import AppworksClient
 from .catalog import EntityCatalog
 from .config import Config, load_config
 from .discovery import discover_catalog
-from .errors import AppworksError, HttpError, NotFoundError
+from .errors import (
+    AppworksError,
+    HttpError,
+    InvalidItemIdError,
+    ItemIdResolutionError,
+    NotFoundError,
+)
 from .request_config import build_request_config
 from .session_cache import SessionCache
 from .tools import handlers
@@ -140,6 +146,16 @@ def _build_server_name(config: Config) -> str:
 
 
 def _build_server_instructions(config: Config) -> str:
+    id_convention = (
+        "Item ids on this platform have two forms: the **internal numeric id** "
+        "(BigInteger, e.g. '9175042') used in REST URLs and exposed in every "
+        "list response under `_links.item.href`, and the **business id** "
+        "(e.g. 'PI2526-000102') shown to humans. `get_entity`, `list_children`, "
+        "`get_child`, and `list_relationship_targets` accept either: business "
+        "ids are auto-resolved by searching DefaultList for an exact, "
+        "case-insensitive property match. The raw `pa_api_call` does not "
+        "auto-resolve — use the numeric id from `_links.item.href` there."
+    )
     if config.transport == "stdio":
         return (
             f"OpenText AppWorks Process Automation MCP server, bound to entity service "
@@ -151,6 +167,7 @@ def _build_server_instructions(config: Config) -> str:
             "  3. Call `query_list(entity=..., list_name='DefaultList', top=10)` to fetch a page of items.\n"
             "  4. Use `get_entity`, `list_children`, `list_relationship_targets` to drill in.\n"
             "  5. `pa_api_call(method='GET', path='/...')` is an escape hatch for any GET endpoint.\n\n"
+            f"{id_convention}\n\n"
             "Write operations (create/update/delete/invoke_action) are not in this release. "
             "Re-run with PA_ALLOW_WRITES=true in the v1.1 release to enable them."
         )
@@ -163,7 +180,8 @@ def _build_server_instructions(config: Config) -> str:
         "Read-only release (v1.0). Discover the surface with `list_entities`, "
         "`describe_entity`, `list_named_lists`, then query via `query_list`, "
         "`get_entity`, `list_children`, `get_child`, `list_relationship_targets`. "
-        "`pa_api_call(method='GET', path='/...')` is the escape hatch."
+        "`pa_api_call(method='GET', path='/...')` is the escape hatch.\n\n"
+        f"{id_convention}"
     )
 
 
@@ -255,7 +273,14 @@ def _register_tools(mcp: FastMCP) -> None:
 
     @mcp.tool(
         name="get_entity",
-        description="Fetch a single entity item by its id.",
+        description=(
+            "Fetch a single entity item. `item_id` is the internal numeric id from "
+            "`_links.item.href` in a list response (e.g. '9175042'). You may also pass a "
+            "human-readable business id (e.g. 'PI2526-000102') and it will be auto-resolved "
+            "via DefaultList: an exact, case-insensitive match on any of the item's "
+            "Properties values wins. Ambiguous (>1 match) and unresolved (0 matches) cases "
+            "return a structured `item_id_resolution_failed` error listing candidates."
+        ),
     )
     async def get_entity(entity: str, item_id: str, ctx: Context) -> dict:
         return await _dispatch(
@@ -267,7 +292,9 @@ def _register_tools(mcp: FastMCP) -> None:
         name="list_children",
         description=(
             "List child entities under a specific parent item. "
-            "Example: list_children(entity='LegalCase', item_id='81921', child_entity='Emails')."
+            "Example: list_children(entity='LegalCase', item_id='81921', child_entity='Emails'). "
+            "`item_id` accepts either the internal numeric id or a business id "
+            "(auto-resolved via DefaultList; see get_entity for the resolution rules)."
         ),
     )
     async def list_children(
@@ -293,7 +320,11 @@ def _register_tools(mcp: FastMCP) -> None:
 
     @mcp.tool(
         name="get_child",
-        description="Fetch a specific child item under a parent entity item.",
+        description=(
+            "Fetch a specific child item under a parent entity item. "
+            "Both `item_id` and `child_id` accept the internal numeric id or a business id "
+            "(auto-resolved via DefaultList; see get_entity for the resolution rules)."
+        ),
     )
     async def get_child(
         entity: str, item_id: str, child_entity: str, child_id: str, ctx: Context
@@ -312,7 +343,11 @@ def _register_tools(mcp: FastMCP) -> None:
 
     @mcp.tool(
         name="list_relationship_targets",
-        description="List the target items of a relationship for a specific item.",
+        description=(
+            "List the target items of a relationship for a specific item. "
+            "`item_id` accepts the internal numeric id or a business id "
+            "(auto-resolved via DefaultList; see get_entity for the resolution rules)."
+        ),
     )
     async def list_relationship_targets(
         entity: str, item_id: str, relationship: str, ctx: Context
@@ -366,6 +401,25 @@ async def _dispatch(
                 "kind": "not_found",
                 "message": str(exc),
                 "url": exc.url,
+            }
+        }
+    except InvalidItemIdError as exc:
+        return {
+            "error": {
+                "kind": "invalid_item_id",
+                "message": str(exc),
+                "attempted_id": exc.attempted_id,
+                "url": exc.url,
+            }
+        }
+    except ItemIdResolutionError as exc:
+        return {
+            "error": {
+                "kind": "item_id_resolution_failed",
+                "message": str(exc),
+                "attempted_id": exc.attempted_id,
+                "entity": exc.entity,
+                "candidates": exc.candidates,
             }
         }
     except HttpError as exc:

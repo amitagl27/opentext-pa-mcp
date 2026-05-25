@@ -61,6 +61,74 @@ class NotFoundError(HttpError):
         super().__init__(404, message, url=url)
 
 
+class InvalidItemIdError(HttpError):
+    """The platform rejected an item-id path segment as un-parseable.
+
+    AppWorks REST endpoints address items by their internal BigInteger primary
+    key (e.g. ``9175042``). When a caller passes the human-readable business id
+    instead (e.g. ``PI2526-000102``), the platform returns HTTP 500 with a
+    Cordys-specific ``EXPRESSION_PARSE_BIGINTEGER_ERROR`` marker. The HTTP layer
+    detects that marker and raises this exception with an actionable message so
+    the tool layer can hint the caller toward auto-resolution rather than
+    surfacing an opaque 500.
+    """
+
+    def __init__(
+        self,
+        attempted_id: str,
+        *,
+        url: str | None = None,
+    ) -> None:
+        message = (
+            f"AppWorks rejected item id {attempted_id!r} because the endpoint "
+            "expects the internal numeric id from `_links.item.href` (a "
+            "BigInteger), not the human-readable business id. Either pass the "
+            "numeric id, or call get_entity / list_children with the business "
+            "id and let the server auto-resolve it via DefaultList."
+        )
+        super().__init__(500, message, url=url)
+        self.attempted_id = attempted_id
+
+
+class ItemIdResolutionError(AppworksError):
+    """Auto-resolution from a business id to the internal numeric id failed.
+
+    Raised when the resolver searched ``DefaultList`` for the supplied string
+    and found zero or more-than-one matches. The :attr:`candidates` list lets
+    the caller (or the LLM through the tool error response) see what the
+    platform actually returned and re-query with a more precise id.
+    """
+
+    def __init__(
+        self,
+        attempted_id: str,
+        candidates: list[dict],
+        *,
+        entity: str,
+    ) -> None:
+        if not candidates:
+            message = (
+                f"Could not resolve business id {attempted_id!r} on entity "
+                f"{entity!r}: DefaultList returned no items containing that "
+                "value. Confirm the id, or call `query_list` with a broader "
+                "`search` term to discover it."
+            )
+        else:
+            preview = ", ".join(
+                f"{c['internal_id']} ({c.get('summary', '')!r})" for c in candidates[:5]
+            )
+            message = (
+                f"Business id {attempted_id!r} on entity {entity!r} matched "
+                f"{len(candidates)} DefaultList items; need exactly one. "
+                f"Candidates: {preview}. Retry with the internal id or a more "
+                "precise business id."
+            )
+        super().__init__(message)
+        self.attempted_id = attempted_id
+        self.candidates = candidates
+        self.entity = entity
+
+
 class ReadOnlyViolationError(AppworksError):
     """A tool tried to perform a write while PA_ALLOW_WRITES was not enabled.
 

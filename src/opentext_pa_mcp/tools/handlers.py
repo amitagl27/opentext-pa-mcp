@@ -6,14 +6,21 @@ JSON-serialisable dict. The FastMCP layer wraps these for tool registration.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from ..auth import AppworksClient
 from ..catalog import EntityCatalog, EntityInfo
-from ..errors import ReadOnlyViolationError
+from ..errors import ItemIdResolutionError, ReadOnlyViolationError
 
 # Methods this read-only release permits through ``pa_api_call``.
 _READ_METHODS: frozenset[str] = frozenset({"GET", "HEAD"})
+
+# AppWorks addresses items by an internal BigInteger primary key in the URL
+# (``/items/<int>``). All-digits => use as-is; anything else => resolve via
+# DefaultList. Keyed on shape (digit-ness), not on entity name.
+_DIGIT_ID_PATTERN = re.compile(r"^\d+$")
+_HREF_INTERNAL_ID_PATTERN = re.compile(r"/items/(\d+)(?:$|[/?#])")
 
 
 # --- Discovery tools ----------------------------------------------------------
@@ -105,9 +112,16 @@ async def get_entity(
     entity: str,
     item_id: str,
 ) -> dict:
-    """Get a single entity item by its id."""
+    """Get a single entity item by its id.
+
+    ``item_id`` may be either the internal numeric id (from a list response's
+    ``_links.item.href``) or a human-readable business id. Business ids are
+    auto-resolved via DefaultList; ambiguous matches raise
+    :class:`ItemIdResolutionError` with the candidate list.
+    """
     _require_entity(catalog, entity)
-    path = f"/{catalog.service_name}/entities/{entity}/items/{item_id}"
+    resolved = await _resolve_item_id(catalog, client, entity, item_id)
+    path = f"/{catalog.service_name}/entities/{entity}/items/{resolved}"
     return await client.api_get(path)
 
 
@@ -131,7 +145,10 @@ async def list_children(
             f"Entity {entity!r} has no child entity {child_entity!r}. "
             f"Available: {sorted(info.child_entities) or '(none)'}."
         )
-    path = f"/{catalog.service_name}/entities/{entity}/items/{item_id}/childEntities/{child_entity}"
+    resolved = await _resolve_item_id(catalog, client, entity, item_id)
+    path = (
+        f"/{catalog.service_name}/entities/{entity}/items/{resolved}/childEntities/{child_entity}"
+    )
     params = _odata_params(top=top, skip=skip)
     raw = await client.api_get(path, params=params)
     return _flatten_list_response(raw, child_entity)
@@ -153,9 +170,11 @@ async def get_child(
             f"Entity {entity!r} has no child entity {child_entity!r}. "
             f"Available: {sorted(info.child_entities) or '(none)'}."
         )
+    parent_resolved = await _resolve_item_id(catalog, client, entity, item_id)
+    child_resolved = await _resolve_item_id(catalog, client, child_entity, child_id)
     path = (
-        f"/{catalog.service_name}/entities/{entity}/items/{item_id}"
-        f"/childEntities/{child_entity}/items/{child_id}"
+        f"/{catalog.service_name}/entities/{entity}/items/{parent_resolved}"
+        f"/childEntities/{child_entity}/items/{child_resolved}"
     )
     return await client.api_get(path)
 
@@ -175,7 +194,10 @@ async def list_relationship_targets(
             f"Entity {entity!r} has no relationship {relationship!r}. "
             f"Available: {sorted(info.relationships) or '(none)'}."
         )
-    path = f"/{catalog.service_name}/entities/{entity}/items/{item_id}/relationships/{relationship}"
+    resolved = await _resolve_item_id(catalog, client, entity, item_id)
+    path = (
+        f"/{catalog.service_name}/entities/{entity}/items/{resolved}/relationships/{relationship}"
+    )
     return await client.api_get(path)
 
 
@@ -218,6 +240,90 @@ def _require_entity(catalog: EntityCatalog, name: str) -> EntityInfo:
             f"Unknown entity {name!r}. Available entities: {sorted(catalog.entities)!r}."
         )
     return info
+
+
+async def _resolve_item_id(
+    catalog: EntityCatalog,
+    client: AppworksClient,
+    entity: str,
+    item_id: str,
+) -> str:
+    """Return the internal numeric id for *item_id* on *entity*.
+
+    Pass-through for all-digit ids. For any other shape, search ``DefaultList``
+    on the entity and look for exactly one item whose string ``Properties.*``
+    value equals *item_id* (exact, case-insensitive); use the int from that
+    item's ``_links.item.href``. Zero or multiple matches raise
+    :class:`ItemIdResolutionError` with the candidate list.
+
+    The logic is entity-agnostic — it relies only on platform invariants
+    (DefaultList exists on every entity, ``_links.item.href`` carries the int).
+    """
+    if _DIGIT_ID_PATTERN.match(item_id):
+        return item_id
+
+    path = f"/{catalog.service_name}/entities/{entity}/lists/DefaultList"
+    raw = await client.api_get(path, params={"$search": item_id})
+    items = _extract_embedded_items(raw, "DefaultList")
+
+    exact = [it for it in items if _has_exact_property_match(it, item_id)]
+    pool = exact if len(exact) == 1 else items
+
+    if len(pool) == 1:
+        internal = _extract_internal_id(pool[0])
+        if internal is not None:
+            return internal
+
+    candidates = [_summarise_candidate(it) for it in items]
+    raise ItemIdResolutionError(item_id, candidates, entity=entity)
+
+
+def _extract_embedded_items(raw: Any, list_name: str) -> list[dict]:
+    if not isinstance(raw, dict):
+        return []
+    embedded = raw.get("_embedded", {})
+    if not isinstance(embedded, dict):
+        return []
+    items = embedded.get(list_name, [])
+    return [it for it in items if isinstance(it, dict)]
+
+
+def _has_exact_property_match(item: dict, needle: str) -> bool:
+    """True when any string value under ``Properties`` equals *needle* exactly.
+
+    Case-insensitive so callers like ``pi2526-000102`` still match the
+    canonical ``PI2526-000102``.
+    """
+    properties = item.get("Properties")
+    if not isinstance(properties, dict):
+        return False
+    needle_cf = needle.casefold()
+    for value in properties.values():
+        if isinstance(value, str) and value.casefold() == needle_cf:
+            return True
+    return False
+
+
+def _extract_internal_id(item: dict) -> str | None:
+    href = item.get("_links", {}).get("item", {}).get("href")
+    if not isinstance(href, str):
+        return None
+    match = _HREF_INTERNAL_ID_PATTERN.search(href)
+    return match.group(1) if match else None
+
+
+def _summarise_candidate(item: dict) -> dict:
+    """Compact representation used in the resolver error message.
+
+    Keeps the internal id (so the caller can retry directly) plus the first
+    few Property string values for human/LLM disambiguation.
+    """
+    properties = item.get("Properties") or {}
+    summary_parts = [f"{k}={v!r}" for k, v in properties.items() if isinstance(v, str)][:3]
+    return {
+        "internal_id": _extract_internal_id(item) or "<unknown>",
+        "summary": ", ".join(summary_parts),
+    }
 
 
 def _odata_params(

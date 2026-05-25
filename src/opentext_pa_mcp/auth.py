@@ -43,7 +43,7 @@ from urllib.parse import urljoin
 import httpx
 
 from .config import Config
-from .errors import AuthenticationError, HttpError, NotFoundError
+from .errors import AuthenticationError, HttpError, InvalidItemIdError, NotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +78,16 @@ _SOAP_FAULTSTRING_PATTERN = re.compile(
     r"<faultstring[^>]*>([^<]+)</faultstring>",
     re.IGNORECASE,
 )
+
+# Cordys returns this marker in the error message body when an /items/{id} path
+# segment fails to parse as a BigInteger primary key (the caller passed a
+# business id instead of the internal numeric one). Keyed on the platform
+# error code, not on endpoint or entity name — see DEC on platform invariants.
+_BIGINT_PARSE_PATTERN = re.compile(
+    r"EXPRESSION_PARSE_BIGINTEGER_ERROR(?:\?value=([^&\s\"']+))?",
+    re.IGNORECASE,
+)
+_ITEM_ID_FROM_URL_PATTERN = re.compile(r"/items/([^/?#]+)")
 
 # SAML 1.1 AuthenticationQuery body used by the Cordys built-in SSO flow. See
 # docs/research/artifacts/cordys-saml-request.xml for the annotated template.
@@ -371,7 +381,26 @@ def _raise_or_parse(resp: httpx.Response) -> Any:
     url = str(resp.url)
     if resp.status_code == 404:
         raise NotFoundError(message, url=url)
+    if (attempted := _detect_bigint_parse_error(message, url)) is not None:
+        raise InvalidItemIdError(attempted, url=url)
     raise HttpError(resp.status_code, message, url=url)
+
+
+def _detect_bigint_parse_error(message: str, url: str) -> str | None:
+    """Return the offending id if *message* carries the BigInteger-parse marker.
+
+    Prefers the value embedded in the message (``?value=...``); falls back to
+    the last ``/items/<id>`` segment of the URL so callers always get the id
+    that triggered the rejection.
+    """
+    marker = _BIGINT_PARSE_PATTERN.search(message)
+    if not marker:
+        return None
+    attempted = marker.group(1)
+    if attempted:
+        return attempted
+    url_match = _ITEM_ID_FROM_URL_PATTERN.search(url)
+    return url_match.group(1) if url_match else "<unknown>"
 
 
 def _is_non_json_success(resp: httpx.Response) -> bool:
