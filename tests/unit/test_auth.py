@@ -272,6 +272,71 @@ class TestApiCalls:
         ]
         assert len(login_posts) == 2
 
+    @respx.mock
+    async def test_200_with_html_body_triggers_re_login_and_retries(self) -> None:
+        """AppWorks responds 200 + text/html (login form) on silent session expiry.
+
+        Because the platform 302-redirects expired sessions to the OTDS login page and
+        httpx follows redirects, the API GET lands on the login HTML with status 200.
+        We must detect the non-JSON body, treat it like a 401, re-login, and retry.
+        """
+        cfg = _make_config()
+        state = LoginState()
+        _register_login_chain(respx.mock, state)
+        api_url = f"{cfg.api_base}/needs/retry"
+
+        call_count = {"n": 0}
+
+        def api_handler(request: httpx.Request) -> httpx.Response:
+            call_count["n"] += 1
+            if call_count["n"] == 1:
+                # Server silently expires the session: redirect follows land on login HTML.
+                state.session_revoked = True
+                return httpx.Response(
+                    200,
+                    text=_login_form_html(),
+                    headers={"content-type": "text/html; charset=utf-8"},
+                )
+            return httpx.Response(200, json={"ok": True})
+
+        respx.mock.get(api_url).mock(side_effect=api_handler)
+
+        async with AppworksClient(cfg) as client:
+            resp = await client.api_get("/needs/retry")
+
+        assert resp == {"ok": True}
+        # Verify we re-ran the full login chain (initial + recovery).
+        login_posts = [
+            c
+            for c in respx.mock.calls
+            if c.request.method == "POST" and str(c.request.url) == OTDS_LOGIN_URL_NOQUERY
+        ]
+        assert len(login_posts) == 2
+
+    @respx.mock
+    async def test_persistent_html_after_retry_raises_auth_error(self) -> None:
+        """If the retry also lands on HTML, surface an AuthenticationError, not JSONDecodeError."""
+        cfg = _make_config()
+        state = LoginState()
+        _register_login_chain(respx.mock, state)
+        api_url = f"{cfg.api_base}/needs/retry"
+
+        def api_handler(request: httpx.Request) -> httpx.Response:
+            # Simulate a backend that immediately expires every fresh session, so the
+            # retry also lands on the login HTML.
+            state.session_revoked = True
+            return httpx.Response(
+                200,
+                text=_login_form_html(),
+                headers={"content-type": "text/html; charset=utf-8"},
+            )
+
+        respx.mock.get(api_url).mock(side_effect=api_handler)
+
+        async with AppworksClient(cfg) as client:
+            with pytest.raises(AuthenticationError, match=r"(?i)session"):
+                await client.api_get("/needs/retry")
+
 
 class TestTlsConfig:
     """AppworksClient must propagate the config's TLS settings to httpx."""

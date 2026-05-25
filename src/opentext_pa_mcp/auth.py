@@ -167,7 +167,12 @@ class AppworksClient:
     async def api_get(self, path: str, *, params: dict[str, Any] | None = None) -> Any:
         """GET *path* under the entity-service REST API. Returns parsed JSON.
 
-        On 401, re-run the configured login flow once and retry.
+        Recovers from two stale-session signals by re-running the login flow once:
+
+        - HTTP 401 — the platform explicitly rejects the session cookie.
+        - HTTP 2xx with a non-JSON ``Content-Type`` — AppWorks silently 302-redirects
+          expired sessions to the OTDS/Cordys login page. Because the underlying
+          ``httpx.AsyncClient`` follows redirects, the final response is 200 + HTML.
 
         Args:
             path: Path under the API base, beginning with ``/`` (e.g. ``/<Service>/entities/Foo/lists/DefaultList``).
@@ -177,11 +182,33 @@ class AppworksClient:
         url = self._build_url(path)
         resp = await self._http.get(url, params=params, headers={"Accept": "application/json"})
 
-        if resp.status_code == 401:
-            logger.info("API call returned 401; re-running login and retrying once.")
+        if _looks_like_session_expired(resp):
+            logger.info(
+                "API call to %s indicates session expired: status=%d, content-type=%r, "
+                "content-length=%d, body[:200]=%r; re-running login and retrying once.",
+                path,
+                resp.status_code,
+                resp.headers.get("content-type", ""),
+                len(resp.content),
+                _body_preview(resp, 200),
+            )
             self._authenticated = False
             await self._ensure_logged_in()
             resp = await self._http.get(url, params=params, headers={"Accept": "application/json"})
+            if _is_non_json_success(resp):
+                logger.warning(
+                    "Retry after re-login still returned non-JSON. url=%s, status=%d, "
+                    "content-type=%r, content-length=%d, body[:500]=%r",
+                    str(resp.url),
+                    resp.status_code,
+                    resp.headers.get("content-type", ""),
+                    len(resp.content),
+                    _body_preview(resp, 500),
+                )
+                raise AuthenticationError(
+                    "AppWorks returned a non-JSON response after re-login. The session "
+                    "could not be restored; the API redirected to the login page again."
+                )
 
         return _raise_or_parse(resp)
 
@@ -317,17 +344,69 @@ class AppworksClient:
 
 
 def _raise_or_parse(resp: httpx.Response) -> Any:
-    """Convert an httpx response into parsed JSON or raise an :class:`HttpError`."""
+    """Convert an httpx response into parsed JSON or raise an :class:`HttpError`.
+
+    Wraps the JSON parse in a try/except so that a malformed body (e.g. truncated
+    payload, JSON ``Content-Type`` with an HTML body) is logged with enough context
+    to debug rather than failing as a bare :class:`json.JSONDecodeError`.
+    """
     if 200 <= resp.status_code < 300:
         if not resp.content:
             return None
-        return resp.json()
+        try:
+            return resp.json()
+        except ValueError:
+            logger.warning(
+                "Failed to parse JSON response. url=%s, status=%d, content-type=%r, "
+                "content-length=%d, body[:500]=%r",
+                str(resp.url),
+                resp.status_code,
+                resp.headers.get("content-type", ""),
+                len(resp.content),
+                _body_preview(resp, 500),
+            )
+            raise
 
     message = _extract_error_message(resp)
     url = str(resp.url)
     if resp.status_code == 404:
         raise NotFoundError(message, url=url)
     raise HttpError(resp.status_code, message, url=url)
+
+
+def _is_non_json_success(resp: httpx.Response) -> bool:
+    """True when the response is 2xx but the body is plainly not JSON.
+
+    AppWorks 302-redirects expired sessions to the OTDS/Cordys login page; with
+    redirect-following enabled the request resolves to a 200 HTML page rather than
+    surfacing as 401. Treat any non-empty 2xx body whose ``Content-Type`` is not
+    JSON as that case.
+    """
+    if not (200 <= resp.status_code < 300):
+        return False
+    if not resp.content:
+        return False
+    content_type = resp.headers.get("content-type", "").lower()
+    return "json" not in content_type
+
+
+def _looks_like_session_expired(resp: httpx.Response) -> bool:
+    """True when the response signals a stale session — either 401 or non-JSON 2xx."""
+    return resp.status_code == 401 or _is_non_json_success(resp)
+
+
+def _body_preview(resp: httpx.Response, limit: int) -> str:
+    """Return the first *limit* characters of the response body for diagnostic logging.
+
+    Decoding errors fall back to a ``repr`` of the raw bytes so that even binary or
+    malformed payloads surface a useful preview. The preview is bounded to *limit*
+    characters to cap PII exposure in container logs.
+    """
+    try:
+        text = resp.text
+    except Exception:
+        return repr(resp.content[:limit])
+    return text[:limit]
 
 
 def _resolve_verify(config: Config) -> bool | str:

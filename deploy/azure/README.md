@@ -40,7 +40,7 @@ az deployment group create `
 | `paServiceUrl` | yes | — | Full AppWorks entity-service URL (the same one you'd set as `PA_SERVICE_URL` for stdio mode). |
 | `paAuthMode` | no | `auto` | `auto` / `otds` / `cordys`. Override only if auto-detection misfires. |
 | `paLogLevel` | no | `INFO` | `DEBUG` / `INFO` / `WARNING` / `ERROR`. |
-| `imageTag` | no | `latest` | The `ghcr.io/amitagl27/opentext-pa-mcp` tag to deploy. Pin to a specific version (e.g. `0.2.0`) in production. |
+| `imageTag` | no | `latest` | The `ghcr.io/amitagl27/opentext-pa-mcp` tag to deploy. Pin to a specific version (e.g. `0.2.2`) in production. |
 | `minReplicas` | no | `1` | Set to `0` for scale-to-zero (cheaper, but first request after idle hits a 5–15 s cold start that Copilot Studio users will notice). |
 | `maxReplicas` | no | `3` | |
 | `cpuCores` | no | `0.5` | vCPU per replica. |

@@ -4,6 +4,29 @@ Narrative log of how the project reached its current state. New entries at the t
 
 ---
 
+## 2026-05-25 — v0.2.2: harden the API auth path + add response diagnostics
+
+Patch release driven by a real Copilot Studio failure against the hosted Container App. The Power Platform connector surfaced `Error calling tool 'query_list': Expecting value: line 1 column 1 (char 0)` after a few minutes of idle. Container logs confirmed the exception originated server-side in our `_raise_or_parse` → `resp.json()` path; the response body that triggered it was never captured. The most plausible cause — an AppWorks session-expiry redirect resolving to `200 + text/html` because `httpx` follows redirects — fit the timeline but was **not proven**. AppWorks session cookies in this tenant are valid for 24h, which weakens the idle-expiry story; the underlying trigger could also be a stale connection-pool entry, a transient backend error returning HTML with 200, or something on the network path between Azure Container Apps and the AppWorks instance.
+
+**Changed (`src/opentext_pa_mcp/auth.py`):**
+- `api_get` now treats `(2xx + non-JSON Content-Type)` as a stale-session signal in addition to the existing 401 path. On either signal it invalidates `_authenticated`, re-runs the configured login flow, and retries the GET once. If the retry **also** returns non-JSON, it raises `AuthenticationError` with a clear message instead of letting `JSONDecodeError` bubble up.
+- Two helpers, `_is_non_json_success` and `_looks_like_session_expired`, factor the detection logic out of `api_get`.
+- Diagnostic logging on three paths so the next recurrence captures what AppWorks actually returned:
+  - `INFO` on the session-expired signal: `status`, `content-type`, `content-length`, `body[:200]`.
+  - `WARNING` when the retry after re-login still returns non-JSON: same fields with `body[:500]`.
+  - `WARNING` in `_raise_or_parse` if `resp.json()` raises despite a JSON Content-Type — catches malformed-payload cases that the Content-Type check would let through. The original `JSONDecodeError` is re-raised after logging.
+- New `_body_preview` helper bounds the logged body at the chosen char limit (200 or 500) and falls back to `repr(content)` for non-text payloads, keeping container logs bounded and limiting PII exposure.
+
+**Tests (`tests/unit/test_auth.py`):**
+- `test_200_with_html_body_triggers_re_login_and_retries` — mirror of the existing 401-retry test, but the first response is `200 + text/html`. Asserts the client re-runs the full login chain and returns the second response's JSON.
+- `test_persistent_html_after_retry_raises_auth_error` — backend keeps expiring the session. Asserts we raise a clean `AuthenticationError`.
+
+**Honest framing:** the defensive fix only solves one specific failure mode. The diagnostic logging is the bigger value — when the failure recurs against the redeployed container, the log lines will reveal whether the response was an OTDS/Cordys login page (defensive fix was on target), an HTML error page (server-side issue), a truncated JSON payload (network/pool issue), or something else.
+
+**Deployment note:** existing Container App deployments pick up the fix on the next image pull. If you pinned `imageTag` to `0.2.1`, redeploy the ARM template with `imageTag=0.2.2`. If you deployed with `imageTag=latest`, restart the revision to force a re-pull.
+
+---
+
 ## 2026-05-21 (later) — v0.2.1: README links to the Copilot deployment guide
 
 Patch release. The root `README.md` hosted-deployment section now links to `docs/azure-copilot-deployment-guide.md`, so anyone connecting the server to Microsoft Copilot or Teams lands on the end-to-end walkthrough directly. No `src/` changes. This release also deliberately exercises the full delivery path — feature branch → PR to DEV → PR to main → public-repo sync → automatic PyPI publish — to validate the CI/CD chain.
